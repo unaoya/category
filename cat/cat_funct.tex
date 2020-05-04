@@ -1,0 +1,402 @@
+\documentclass[uplatex]{jsarticle}
+\RequirePackage{amsmath,amssymb,amsthm, amscd, comment, multicol}
+\usepackage[all]{xy}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{tikz-cd}
+\input{../../tex/theorems}
+\input{../../tex/symbols}
+
+\title{圏と関手}
+\author{@unaoya}
+\date{\today}
+\begin{document}
+
+\maketitle
+順序集合の話の最後に描いた図の条件を緩めて二点を結ぶ矢印がたくさんあってもよいことにし、
+一点自身を結ぶ矢印のうち恒等射と呼ばれる特別なものを一つ選ぶことにする。
+さらに、二つの矢印を繋げるとどの矢印になるか方も指定する。
+
+そのように点と矢印を描いたものを圏だと思うことができる。
+順序集合の場合には、二つの点を結ぶ矢印は多くとも一つしかなかったので恒等射や矢印の繋がり方は必然的に決まったが、
+一般には候補がいくつもあるので、単純に絵を描いただけでは圏の情報を全て漏らさず表現することはできないことに注意しよう。
+
+\section{圏の定義と例}
+上のことを踏まえて以下のように定義する。
+\begin{dfn}[圏]
+圏$C$とは
+\begin{itemize}
+\item 対象の集まり$\Ob(C)$
+\item 任意の$x, y\in \Ob(C)$にたいし射の集まり$\Hom_C(x,y)$
+\end{itemize}
+及び、
+\begin{itemize}
+\item 対象$x\in \Ob(C)$に対し恒等射$\id_x\in\Hom_C(x,x)$
+\item 射の合成$\Hom_C(x,y)\times\Hom_C(y,z)\to \Hom_C(x,z); (f,g)\to g\circ f$
+\end{itemize}
+が定まっていて、全ての射$f, g, h$について
+\begin{align*}
+\id_x\circ f=f\circ \id_x=f\\
+(f\circ g)\circ h=f\circ(g\circ h)
+\end{align*}
+が成り立つもの。
+\end{dfn}
+絵で言えば$\Ob(C)$が点の集合、$\Hom_C(x,y)$が$x$から$y$向きの矢印の集合で、矢印は$0$本でもいいし無限にあってもいい。
+\footnote{実際には対象全体や射全体が集合でないような圏を扱うこともあるが、ここでは全て圏といえば対象全体や射全体が集合となるようなものとする} 
+
+射の合成というのが、上で述べた矢印の繋ぎ方である。
+恒等射とある矢印$f$を繋いだら$f$そのものになり、また三つの矢印をつなぐ時にはそのつなぐ順番によらず決まるということが要請されている。
+
+すでにいくつか紹介しているが、圏の例を見ていこう。
+
+\begin{eg}
+圏$\Sets$を
+\begin{itemize}
+\item 対象の集合$\Ob(\Sets)$を集合全て\footnote{その時点で思いつく集合すべてぐらいの意味で、それ以上深く考えない}を集めたもの
+\item 射の集合$\Hom_{\Sets}(x,y)$を集合$x,y$の間の写像全てを集めたもの
+\end{itemize}
+で定義する。
+
+対象$x$の恒等射は集合$x$の恒等写像$\id_x$とし、射の合成は合成写像$g\circ f(x) = g(f(x))$で定義する。
+これらはともに集合の間の写像で、条件を満たす。
+\end{eg}
+
+\begin{eg}
+順序集合$X$を考える。
+これに対して圏$X$を
+\begin{itemize}
+\item 対象の集合$\Ob(X)$を集合$X$
+\item 射の集合$\Hom_{X}(x,y)$を
+\begin{align*}
+\Hom_X(x,y)=\begin{cases}\{\to\} &x\leq y\\ \emptyset &\mbox{そうでない時}\end{cases}
+\end{align*}
+\end{itemize}
+で定義する。
+
+各対象の間の射は多くとも一つしかないので、射の結合はできるのであれば自動的に決まってしまう。
+$x \leq x$だから、$\Hom(x,x)$は空でなく従って$\id_x$が存在する。
+また$x \leq y, y \leq z$ならば$x \leq z$だから、射の合成$\Hom(x,y) \times \Hom(y,z) \to \Hom(x,z)$が定義できる。
+
+逆に圏$C$が、すべての射の集合が高々1元でしかも$\Hom_C(x,y)$か$\Hom_C(y,x)$のいずれかは必ず空である、
+という条件を満たせば、上の逆の対応で順序集合を作ることができる。
+
+このような圏を順序集合に対応する圏ということにする。
+\end{eg}
+
+\begin{eg}
+実ベクトル空間全体の圏$\Vect_\R$を
+\begin{itemize}
+\item 対象の集合$\Ob(\Vect_\R)$を$\R$線形空間全てを集めたもの
+\item 射の集合$\Hom_{\Vect_\R}(x,y)$を$x,y$の間の$\R$線形写像全てを集めたもの
+\end{itemize}
+で定義する。
+
+対象$x$の恒等射はベクトル空間$x$の恒等写像$\id_x$とし、射の合成は合成写像$g\circ f(x) = g(f(x))$で定義する。
+これらはともに線形写像であり、条件を満たす。
+\end{eg}
+
+\begin{eg}
+圏$\Gamma$を
+\begin{itemize}
+\item 対象の集合$\Ob(\Gamma)=\{e,v\}$
+\item 射の集合$\Hom_\Gamma(e,e)=\{\id_e\},\Hom_\Gamma(e,v)=\{s,t\}, \Hom_\Gamma(v,v)=\{\id_v\},\Hom_\Gamma(v,e)=\emptyset$
+\end{itemize}
+で定義する。これを図で描くと
+\begin{xy}
+(0,0)*{\bullet}*+!D{0}="A",
+(10,0)*{\bullet}*+!D{1}="B",
+\ar @(lu,ld) "A";"A"
+\ar @(ru,rd) "B";"B"
+\ar @<1mm> "A";"B"
+\ar @<-1mm> "A";"B"
+\end{xy}
+となる。
+\end{eg}
+
+\begin{rem}
+繰り返しになるが、圏を上のように図示しても一般には射の合成の様子までは見えないことに注意する。
+例えば
+\begin{itemize}
+\item $C$を$\Ob(C)=\{x\}, \Hom_C(x,x)=\{id_x,f\}$で射の合成が$f\circ f=id_x$から定まる圏
+\item $C'$を$\Ob(C)=\{x\}, \Hom_C(x,x)=\{id_x,f\}$で射の合成が$f\circ f=f$から定まる圏
+\end{itemize}
+とする。
+
+このとき、どちらも
+\begin{xy}
+(0,0)*{\bullet}*+!D{0}="x",
+\ar @(lu,ld) "x";"x"
+\ar @(ru,rd) "x";"x"
+\end{xy}
+という図になって、図からは区別ができないが、二つの圏は異なるものである。
+\end{rem}
+
+与えられた圏$C$に対してその射の向きを全てひっくり返した圏を考えることができる。
+\begin{dfn}
+圏$C$にたいし、圏$C^{\rm op}$を
+\begin{itemize}
+\item 対象の集合$\Ob(C^{\rm op})$は$\Ob(C)$と同じ
+\item 射の集合$\Hom_{C^{\rm op}}(x,y)$は$\Hom_C(y,x)$と同じ
+\end{itemize}
+により定義する。
+\end{dfn}
+これは上で説明したような図で言うと、$C$と同じ点を持ち矢印の向きを逆にした圏ということである。
+
+\begin{rem}
+集合の圏のように、実際に射が何らかの写像となっている場合、写像の向きと射の向きが逆になるので混乱しやすい。
+つまり、集合$X, Y$とその写像$f:X \to Y$は$\Sets$における射$f\in\Hom_{\Sets}(X,Y)$を定めており、これは同時に$f\in\Hom_{\Sets^{\rm op}}(Y,X)$も定めているが、あくまでも写像としては$X$の要素に対して$Y$の要素を対応させるものである。
+
+この混乱を避けるために、上で決まる$\Sets^{\rm op}$の射は$f^{\rm op}$と書くことにする。
+\end{rem}
+
+\begin{eg}
+順序集合$X$について、それを圏とみなしたものも$X$と書くことにする。
+$X^{\rm op}$は全ての大小関係をひっくり返してできる順序集合を圏とみなしたものである。
+\end{eg}
+
+圏においては矢印、つまり射が重要ということがよく言われる。
+別の言い方をすると、ある対象と他の対象との関係を表現するのが圏である。
+
+その意味で、他の対象との関係だけでは区別することができない二つの対象のことを同型という。
+正確には以下のように定義する。
+
+\begin{dfn}
+圏$C$の射$f:x\to y$が同型とは、ある$g:y\to x$があって$f\circ g=\id_x, g\circ f=\id_y$なることを言う。
+この時$x$と$y$は同型であるともいう。
+\end{dfn}
+
+\begin{eg}
+集合の圏$\Sets$において、一元からなる集合は全て同型である。
+また、ベクトル空間の圏$\Vect_\R$において同じ次元$n$を持つベクトル空間は全て同型である。
+\end{eg}
+
+\section{関手の定義と例}
+二つの圏を結びつけるために、関手を定義する。
+前に説明した順序集合の例で言えば、順序集合$X, Y$を圏とみなしたとき、順序を保つ写像$f:X \to Y$が関手に対応する。
+
+これを一般の圏について定義しよう。
+
+\begin{dfn}[関手]
+$C, D$を圏とする。関手$F:C\to D$とは
+\begin{itemize}
+\item 対象の集合の間の写像$F_{\Ob}:\Ob(C)\to \Ob(D)$
+\item 任意の$C$の対象$x,y$について射の集合の間の写像$F_{x,y}:\Hom_C(x,y)\to \Hom_D(F(x),F(y))$
+\end{itemize}
+なる写像のたちの集まりであって、
+\begin{itemize}
+\item 任意の対象$x\in\Ob(C)$にたいし$F_{x,x}(\id_x)=\id_{F_{\Ob}(x)}$となる
+\item 任意の射$f:x\to y, g:y\to z$に対し、$F_{x,z}(g\circ f)=F_{y,z}(g)\circ F_{x,y}(f)$となる
+\end{itemize}
+という条件をみたすもの。
+\end{dfn}
+
+このような関手を共変関手と呼ぶこともある。
+
+\begin{rem}
+関手$F:C\to D$として射の対応を$f:x\to y$の行き先を$F(f):F(y)\to F(x)$とするものを考え、これを反変関手と呼ぶこともある。
+これは$C^{\rm op}$からの関手を考えるとみなせるので、ここでは反変関手という言葉は使わない。
+\end{rem}
+
+\begin{eg}
+圏$C$に対して恒等関手$\id_C$を対象$x$を$x$にうつし、射$f:x \to y$を射$f:x \to y$にうつす関手とする。
+\end{eg}
+
+\begin{eg}
+冪集合により定まる関手$P:\Sets^{\rm op}\to\Sets$を考える。
+
+これは、
+\begin{itemize}
+\item 写像$\Ob(\Sets^{\rm op})\to \Ob(\Sets)$を集合$X$に対してその冪集合$P(X)$を対応させる
+\item 写像$\Hom_{\Sets^{\rm op}}(Y,X)\to \Hom_{\Sets}(P(Y),P(X))$を写像$f:X\to Y\in\Hom_{\Sets^{\rm op}}(Y,X)$に$P(f):P(Y)\to P(X)\in\Hom_{\Sets}(P(X),P(Y))$を対応させる
+\end{itemize}
+によって定めることができる。
+
+$A \subset X$に対し、$P(\id)(A)=A$であること、及び集合の写像$f:X \to Y, g:Y \to Z, B\subset Z$に対して
+$\Sets^{\rm op}$の射$f^{\rm op}:Y \to X, g^{\rm op}:Z \to Y$が定まり、$B \subset Z$に対して
+\begin{align*}
+P(f^{\rm op})(P(g^{\rm op})(B))=P(f^{\rm op}\circ g^{\rm op})(B)
+\end{align*}
+が成り立つ。
+\end{eg}
+
+\begin{eg}
+順序集合$X, Y$をそれぞれ圏とみなす。
+すると$X, Y$の間の順序集合の射$f:X \to Y$とは関手$f:X \to Y$である。
+
+まず$f_{\Ob}$は集合の写像としての$f$とする。
+また$f_{x,y}$だが、
+\begin{align*}
+\Hom_X(x,y)=\begin{cases}\{\to\} &x\leq y\\ \emptyset &\mbox{そうでない時}\end{cases}
+\end{align*}
+であること、及び空でない集合から空集合への写像は存在しないことに注意すると、
+$x\leq y$の時には$\Hom_Y(f(x),f(y))\neq\emptyset$でなくてはならず、これはつまり$f(x)\leq f(y)$ということになる。
+つまり、$x\leq y$ならば$f(x)\leq f(y)$ということで、これは順序集合の射の条件そのもの。
+\end{eg}
+
+\begin{eg}
+集合$X$との直積をとるという操作により関手$\Sets \to \Sets$が定まる。
+
+\begin{itemize}
+\item 写像$\Ob(\Sets)\to \Ob(\Sets)$を集合$Y$に対して集合$Y \times X$を対応させる
+\item 写像$\Hom_{\Sets}(Y,Z)\to \Hom_{\Sets}(Y\times X,Z \times X)$を写像$f:Y \to Z$に対して、$f\times \id_X(y,x)=(f(y),x)$で定まる写像$f\times \id_X:Y \times X \to Z \times X$を対応させる
+\end{itemize}
+によって定める。
+\end{eg}
+上の直積の例では、$Y$に対して$X \times Y$を対応させることでも同じような関手を作ることができる。
+このようにして作った関手は異なるもののように思えるが、直積で左右入れ替えるということを考えるとどちらも同じようなものと言える。
+この二つの関手は自然に同一視できる。
+つまり、後で述べるように上の二つの関手の間には自然変換があり、その意味で同型になる。
+
+\vspace{10pt}
+次の例は、上と違って二つの集合から直積を作るという操作を関手とみなす。
+その関手の定義域として、二つの集合の組を対象とする圏を考えることになるが、後の話を見据えてこれを関手の圏として記述してみよう。
+\begin{eg}
+二つの集合の直積を関手として捉えよう。
+まず集合$\{0,1\}$を圏とみなす。
+これは対象が$\{0,1\}$の二つで、射はそれぞれの恒等射$\id_0, \id_1$のみからなるもの。
+この集合に自明な順序のみを定めた順序集合に対応する圏と言ってもよい。
+
+次に関手$I:\{0,1\} \to \Sets$を考える。
+これは単に集合二つを選択すると考えればよい。
+実際、この関手が定めるべきデータは集合$I(0), I(1)$と射$I(\id_0), I(\id_1)$であるが、後者は$\id_{I(0)}, \id_{I(1)}$にならなければならず、
+従って$I$を決めるということは$\Sets$の対象である集合$I(0), I(1)$を選ぶことに他ならない。
+
+このような関手全体のなす圏を考える。
+つまり、集合二つの組を対象とし、射は集合の写像二つの組であるような圏を考える。
+この圏を$\Sets^2$と書くことにしよう。
+
+直積を取るという操作により関手$\Sets^2 \to \Sets$が定まる。
+\begin{itemize}
+\item 写像$\Ob(\Sets^2)\to \Ob(\Sets)$を集合の組$(X,Y)$に対して集合$X \times Y$を対応させる
+\item 写像$\Hom_{\Sets^2}((X,Y),(Z,W))\to \Hom_{\Sets}(X\times Y,Z \times W)$を写像の組$(f:X \to Y, g:Z \to W)$に対して、$(f \times g)(x,z)=(f(x), g(z))$で定まる写像$f\times g:X \times Y \to Z \times W$を対応させる
+\end{itemize}
+によって定める。
+\end{eg}
+
+\begin{eg}
+有向グラフを関手$\Gamma \to \Sets$とみなすことができる。
+有向グラフというのはいくつかの頂点とそれらを結ぶいくつかの辺からなる図のこと。
+関手$F:\Gamma \to \Sets$を定めることで、
+\begin{itemize}
+\item $\Gamma$の対象$\{e,v\}$に対して$\Sets$の対象、つまり集合$F(e), F(v)$
+\item $\Gamma$の射$s:e \to v, t:e \to v$に対し$\Sets$の射、つまり集合の写像$F(s):F(e) \to F(v), F(t):F(e) \to F(v)$
+\end{itemize}
+が定まる。
+
+$F(v)$を頂点の集合とし、$F(e)$を辺の集合とする。
+各辺$e_i \in F(e)$に対して頂点$F(s)(e_i) \in F(v)$と$F(t)(e_i) \in F(v)$を結ぶ。
+
+例えば$F$を$F(v)=\{a,b,c,d\}, F(e)=\{1,2,3,4,5,6\}$とし、$F(s), F(t)$を
+\begin{align*}
+(F(s)(1), F(s)(2), F(s)(3), F(s)(4), F(s)(5), F(s)(6)) = (a,a,a,b,c,d)\\
+(F(t)(1), F(t)(2), F(t)(3), F(t)(4), F(t)(5), F(t)(6)) = (b,c,d,c,d,b)
+\end{align*} 
+とすると、以下のような有向グラフが書ける。
+
+\begin{center}
+\begin{xy}
+(0,0)*{\bullet}*++ !D{a}="a",
+(0,10)*{\bullet}*++!D{b}="b",
+(8.5,-5)*{\bullet}*++!D{c}="c",
+(-8.5,-5)*{\bullet}*++!D{d}="d",
+\ar "a";"b"
+\ar "a";"c"
+\ar "a";"d"
+\ar "b";"c"
+\ar "c";"d"
+\ar "d";"b"
+\end{xy}
+\end{center}
+\end{eg}
+
+次の例はベクトル空間の定義を知っている人向けのもので、特にこの先必要なものではないので読み飛ばしてもらって構わない。
+\begin{eg}
+集合の圏$\Sets$から実ベクトル空間の圏$\Vect_\R$への関手として
+\begin{itemize}
+\item 集合$X$に対して$X$を定義域にもつ実数値関数全体$\R^X$を対応させる関手$\Sets \to \Vect_\R$
+\item 集合$X$に対して$X$を基底とするベクトル空間$\R^{\oplus X}$を対応させる関手$\Sets \to \Vect_\R$
+\item 集合$X$に対して$X$の要素を変数にもつ多項式全体$\R[X]$を対応させる関手$\Sets \to \Vect_\R$
+\end{itemize}
+を定義することができる。
+これが関手となるためにはどのように射を対応させればよいか考えてみよ。
+
+またベクトル空間$V$からその双対空間$\Hom_\R(V, \R)$をとることで関手$\Vect_\R \to \Vect_\R$が定まる。
+\end{eg}
+
+\section{表現可能関手}
+様々な関手の中で、表現可能関手と呼ばれる特によい性質を持つ関手について説明したい。
+これは後で米田の補題を述べるためにも必要である。
+
+圏$C$の対象$x$に対して定まる二種類の関手$g_x:C \to \Sets$と$h_x:C^{\rm op} \to \Sets$を以下のようにして定める。
+
+\begin{dfn}
+$x$を圏$C$の対象とする。
+関手$g_x:C\to \Sets$を
+\begin{itemize}
+\item $C$の対象$y\in\Ob(C)$にたいし集合$\Hom_C(x,y)\in\Ob(\Sets)$
+\item $C$の射$f:y\to z$にたいし、集合の写像$g_x(f)=f^*:\Hom_C(x,y)\to\Hom_C(x,z)$を$\phi\mapsto f\circ\phi$
+\end{itemize}
+として定義する。
+\end{dfn}
+
+\begin{eg}
+$C=\Sets$の対象$x=[0]$が定める関手$g_{[0]}:\Sets \to \Sets$を$X \mapsto \Hom([0], X)$により定める。
+これは前にも述べたように、実際には$X$そのものと自然に同一視できる。
+\end{eg}
+
+\begin{eg}
+$C=\Sets$の対象$x=[1]$が定める関手$g_{[1]}:\Sets \to \Sets$を$X \mapsto \Hom([1], X)$により定める。
+これは、実際には$X$の元二つを順序付きで並べたものの集まりと自然に同一視できる。
+つまり、$f:[1] \to X$という写像は$f(0)=x, f(1)=y$なら、$(x,y)$という組を指定することと同じ。
+
+さらに、この関手による射の対応は、$g:X \to Y$に対して$g_{[1]}(g):\Hom([1], X) \to \Hom([1], Y)$を$(x,y)$という組みに対応する写像を$(g(x), g(y))$という組みに対応する写像に写すもの。
+\end{eg}
+
+\begin{dfn}
+$x$を圏$C$の対象とする。
+関手$h_x:C^{\rm op}\to \Sets$を
+\begin{itemize}
+\item $C$の対象$y\in\Ob(\Sets)$にたいし集合$\Hom_C(y,x)\in\Ob(\Sets)$
+\item $C$の射$f:y\to z$にたいし、集合の写像$h_x(f)=f^*:\Hom(y,x)\to\Hom(z,x)$を$\phi\mapsto \phi\circ f$
+\end{itemize}
+として定義する。
+\end{dfn}
+
+\begin{eg}
+$C=\Sets$の対象$x=[1]$が定める関手$h_{[1]}:\Hom(X,[1])$を$X \mapsto \Hom(X,[1])$により定める。
+写像$f:X \to [1]$を決めるということは$X$の要素を$0$にうつる要素と$1$にうつる要素の二つに分けるということ。
+つまり$X$を二つの集合$A, B$に分けるということに対応する。
+
+このように見たとき、関手による射の対応はどのように見えるか。
+写像$g:X \to Y$に対して$g^{\rm op}:Y \to X$が定まり、$h_{[1]}(g^{\rm op}):\Hom(Y,[1]) \to \Hom(X,[1])$が定まる。
+$Y$を二つの集合$C, D$に分けることで決まる写像$f:Y \to [1]$を$h_{[1]}(g^{\rm op})$でうつすと、$h_{[1]}(g^{\rm op})(f)=f\circ g:X \to [1]$という写像になる。
+これは$X$の二つの集合$A, B$として$g$により$C$にうつるもの全体、$D$にうつるもの全体、の二つに分けることになる。
+\end{eg}
+
+\begin{eg}
+$C=\Sets$の対象$x=[1]\times[1]$が定める関手$h_{[1]\times[1]}\Hom(X,[1] \times [1])$を$X \mapsto \Hom(X,[1]\times[1])$により定める。
+写像$f:X \to [1] \times [1]$というのは$f(x)=(0,0), (0,1), (1,0), (1,1)$のいずれかであり、これは$X$を四つの集合に分けることになる。
+
+しかし、これは単に四つに分けるというよりは、$[1] \times [1]$が直積であるということを考えると、$X$を二つの集合に分ける方法$A, B$と$C,D$の二通りを指定すると考える方がよい。
+
+このように見たときに、射の対応がどのようになるか、上の例と同様に考えよう。
+\end{eg}
+
+\begin{eg}
+順序集合$X$とその要素$x \in X$から定めた$h_x$という関数は表現可能関手の例である。
+その定義を復習すると、$x\in X$に対し関手$h_x:X\to \Sets$を$h_x(y)=\Hom_X(y,x)\mbox{の元の個数}$として定める。
+つまり
+\[
+h_x(y)=\begin{cases}1&y\leq x\\0&\mbox{それ以外}\end{cases}
+\]
+
+関手として改めてこの関数を記述してみよう。
+圏$X$の対象$x\in X$に対し関手$h_x:X\to \Sets$を$h_x(y)=\Hom_X(y,x)$として定める。
+つまり
+\[
+h_x(y)=\begin{cases}\{\to\}&y\leq x\\\emptyset&\mbox{それ以外}\end{cases}
+\]
+順序集合の定義で$x \leq x$と$x\leq y, y\leq z$ならば$x\leq z$であることから、これが関手になることがわかる。
+
+下の関手からその行き先の要素の個数を数えることで、上の関数を定めることができる。
+\end{eg}
+\end{document}

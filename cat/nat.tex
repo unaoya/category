@@ -1,0 +1,540 @@
+\documentclass{jsarticle}
+\RequirePackage{amsmath,amssymb,amsthm, amscd, comment, multicol}
+\usepackage[all]{xy}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{tikz-cd}
+\input{../../tex/theorems}
+\input{../../tex/symbols}
+
+\title{自然変換}
+\author{@unaoya}
+\date{\today}
+\begin{document}
+
+\maketitle
+
+ここまでいくつかの例において、\emph{自然な}対応、\emph{自然な}写像といったものがでてきた。
+改めてその例を見ながら、\emph{自然変換}の定義を確認していく。
+自然変換は二つの関手を結び付けるためのものである。
+
+例えば、二つの集合の組$(X,Y)$から、その直積$X \times Y$を対応させることで関手が定まる。
+一方で、$(X, Y)$から$Y \times X$を対応させることでも関手が定まる。
+この二つの関手は、見た目は異なるものの、$X \times Y$という集合と$Y \times X$という集合は二つの成分を入れ替えることで、同一視できる。
+ここでポイントとなるのは、$X\times Y$と$Y \times X$の同一視が$X$や$Y$という集合を色々入れ替えても全く統一的にできるというところにある。
+このような性質を持って、自然変換を定義する。
+
+ここでは、自然変換の定義を一般的に行う前に、いくつかの例を通して自然変換という概念に触れてもらうという構成にした。
+特に、冪集合の例は、この後の米田の補題の応用としてドモルガンの定理を証明する際に必要になるので、
+ぜひ手を動かして考えながら読んでほしい。
+
+二つの圏$C, D$に対して、その間の関手全体の圏$C^D$を考えることができ、
+この関手の圏の射$\phi:F\to G$こそが自然変換である。
+この節の終わりに、このようにして自然変換を定義する。
+
+では、まずはここまでに出てきた「自然な」対応の例をいくつか振り返ってみよう。
+
+\section{一点集合からの写像}
+集合の圏$\Sets$から$\Sets$への関手として、$\Sets$の対象$[0]=\{0\}$により定まるもの$g_{[0]}$があった。
+これは、
+\begin{itemize}
+\item 対象の対応が$X \mapsto \Hom_{\Sets}([0], X)$
+\item 射の対応が$(f:X \to Y) \mapsto (f_*:\Hom_{\Sets}([0],X) \to \Hom_{\Sets}([0],Y)$
+\end{itemize}
+として定まる関手である。
+
+ここで集合$\Hom([0],X)$がどのようなものか考えてみよう。
+$f\in\Hom([0],X)$は一点集合$[0]=\{0\}$から$X$への写像なので、$0$のうつり先$f(0)$のみで決定される。
+したがって、$\Hom([0],X)$と$X$は$f$に対して$f(0)$を対応させることで、集合として同一視することができる。
+つまり、全単射$\phi(X):\Hom([0],X) \to X$が$\phi(X)(f)=f(0)$により定まる。
+
+この同一視は単に要素がぴったり対応するという以上に、\textbf{自然な}同一視と呼ばれる特別な同一視である。
+これがどういうことかを見ていく。
+
+上の写像を$\phi(X)$という形であえて$X$を明示したが、これはなぜかというと別の集合$Y$についても同様に
+全単射$\phi(Y):\Hom([0],Y) \to Y$が$\phi(Y)(f)=f(0)$により定まるからである。
+
+さらに、写像$g:X \to Y$が存在したとすると、$g_{[0]}$が関手であるから$g_{[0]}(g):g_{[0]}(X) \to g_{[0]}(Y)$が定まる。
+この$g_{[0]}(g)$は$f:[0] \to X$に$g$を合成して$g\circ f:[0] \to Y$を対応させるという写像であった。
+この$g_{[0]}(g)(f)\in g_{[0]}(Y)=\Hom([0],Y)$を$\phi(Y)$を用いて$Y$にうつすと、$\phi(Y)(g_{[0]}(g)(f))=g_{[0]}(f)(0)=(g\circ f)(0)=g(f(0))=g(\phi(X)(f))$となる。
+つまり、
+\begin{align*}
+\phi(Y)(g_{[0]}(g)(f))=g(\phi(X)(f))
+\end{align*}
+である。
+左辺は$f\in g_{[0]}(X)=\Hom([0],X)$を$g_{[0]}(g):g_{[0]}(X) \to g_{[0]}(Y)$でうつし、さらに$\phi(Y):g_{[0]}(Y) \to Y$でうつしたもので、
+右辺は$f\in g_{[0]}(X)=\Hom([0],X)$を$\phi(X):g_{[0]}(X) \to X$でうつし、さらに$g:X \to Y$でうつしたものである。
+上の等式はこの二つが一致するということをいっており、このような状況を表すために\emph{可換図式}というものを導入する。
+
+今出てきた四つの集合とその間の四つの写像を下のような図に表す（この図の上下左右には特に意味はない）。
+\[
+\begin{CD}
+g_{[0]}(X)@>\phi(X)>>X\\
+@Vg_{[0]}(g)VV@VgVV\\
+g_{[0]}(Y)@>\phi(Y)>>Y
+\end{CD}
+\]
+この図式が可換であるとは、$g_{[0]}(X)$から$Y$に向かうふた通りの方法で写像を合成して得られる二つの写像
+$\phi(Y)\circ g_{[0]}(g)$と$g\circ \phi(X)$が一致する、言い換えると$f\in g_{[0]}(X)$に対して
+\begin{align*}
+\phi(Y)(g_{[0]}(g)(f))=g(\phi(X)(f))
+\end{align*}
+が成り立つということをいう。
+
+これをふまえて、改めて$g_{[0]}(X)$と$X$が自然に同一視できるということを述べる。
+全ての集合$X, Y$及びその間の写像$g:X \to Y$に対して、全単射$\phi(X):g_{[0]}(X) \to X$が存在して、以下の図式
+\[
+\begin{CD}
+g_{[0]}(X)@>\phi(X)>>X\\
+@Vg_{[0]}(g)VV@VgVV\\
+g_{[0]}(Y)@>\phi(Y)>>Y
+\end{CD}
+\]
+が可換であるとき、$g_{[0]}(X)$と$X$が自然に同一視できるという。
+
+\vspace{10pt}
+上の写像は全単射であったから逆写像が存在するので、それを明示的に述べよう。
+まず集合$X$に対して、$\psi(X):X \to g_{[0]}(X)=\Hom([0],X)$を定める。
+$X$の各要素$x\in X$に対して、$\psi(X)(x):[0] \to X$を$0$の行き先が$x$であるような写像として定義する。
+同様にして、集合$Y$に対しても$\psi(Y):Y \to g_{[0]}(Y)$も定めることができる。
+
+写像$g:X \to Y$に対して、次の図式を可換にすることを確かめよう。
+
+\[
+\begin{CD}
+X@>\psi(X)>>g_{[0]}(X)\\
+@VgVV@Vg_{[0]}(g)VV\\
+Y@>\psi(Y)>>g_{[0]}(Y)
+\end{CD}
+\]
+上の図式が可換であるとは$X$から$g_{[0]}(Y)$への二つの写像$\psi(Y)\circ g$と$g_{[0]}(g)\circ \psi(X)$が一致するということであり、
+いいかえると$x\in X$に対して$g_{[0]}(g)(\psi(X)(x))=\psi(Y)(g(x))$がなりたつということを確かめればよい。
+
+$\psi(X)(x)$は$0\in[0]$を$x\in X$にうつす写像$[0] \to X$であり、これを$g_{[0]}(g)$でうつすというのは$g$を合成するということ。
+つまり、$g_{[0]}(g)(\psi(X)(x))$は$0$を$g(x)$にうつす写像$[0] \to Y$である。
+
+一方$\psi(Y)(g(x))$は$0 \in [0]$を$g(x) \in Y$にうつす写像であるから、$g_{[0]}(g)(\psi(X)(x))$と$\psi(Y)(g(x))$はともに写像$[0] \to Y$で$0$を$g(x)$にうつす写像であり、この二つは一致することがわかる。
+したがって確かに図式は可換になり、$\psi(X)$たちは自然な同一視を定めている。
+
+\vspace{10pt}
+上で述べたことを二つの関手の間の対応という形でいいかえる。
+恒等関手$\id:\Sets\to \Sets$は$\id(X)=X, \id(f)=f$で定まる関手である。
+$\Sets$の各対象$X$に対して、写像$\phi(X):g_{[0]}(X)=\Hom([0],X) \to \id(X)=X$を$f$に対して$f(0)$を対応させることで定める。
+すると、$\Sets$の任意の射$g:X \to Y$に対して、次の図式
+\[
+\begin{CD}
+g_{[0]}(X)@>\phi(X)>>\id(X)\\
+@Vg_{[0]}(g)VV@V\id(g)VV\\
+g_{[0]}(Y)@>\phi(Y)>>\id(Y)
+\end{CD}
+\]
+が可換になる。
+このように$\phi(X)$の集まりであって上の図式を可換にするものを、二つの関手$g_{[0]}$と$\id$の間の\textbf{自然変換}$\phi:g_{[0]} \to \id$という。
+
+これと同様にして、上で説明したように自然変換$\psi:\id \to g_{[0]}$を定めることができ、この二つの自然変換は互いに逆の対応を与えている。
+
+\vspace{10pt}
+
+自然変換の例をもう一つ見てみよう。
+$C=\Sets$の対象$x=[1]$が定める関手$g_{[1]}:\Sets \to \Sets$を
+\begin{itemize}
+\item 対象の対応が$X \mapsto \Hom([1], X)$
+\item 射の対応が$(f:X \to Y) \mapsto (f_*:\Hom_{\Sets}([1],X) \to \Hom_{\Sets}([1],Y))$
+\end{itemize}
+により定義する。
+
+$\Hom_{\Sets}([1],X)$の要素$f:[1] \to X$は$f(0), f(1)$のみから一通りに定まる写像で、$X$の元二つを順序付きで並べたものと対応する。
+つまり全単射$\phi(X):\Hom_{\Sets}([1],X) \to X \times X$が存在する。
+関手$\Delta:\Sets \to \Sets$を
+\begin{itemize}
+\item 対象の対応が$X \mapsto X \times X$
+\item 射の対応が$(f:X \to Y) \mapsto (f\times f:X \times X \to Y\times Y;(x_1,x_2) \mapsto (f(x_1),f(x_2)))$
+\end{itemize}
+により定義したとき、上の$\phi(X)$が関手$g_{[1]}:\Sets \to \Sets$と$\Delta:\Sets \to \Sets$の間の自然変換$g_{[1]} \to \Delta$を与えることを上と同様に確かめてみよう。
+
+$g:X \to Y$に対して、次の図式。
+\[
+\begin{CD}
+g_{[1]}(X)@>\phi(X)>>\Delta(X)\\
+@Vg_{[1]}(g)VV@V\Delta(g)VV\\
+g_{[1]}(Y)@>\phi(Y)>>\Delta(Y)
+\end{CD}
+\]
+が可換であればよいので、それを確かめる。
+つまり、全ての$f \in g_{[1]}(X)$に対して、
+\begin{align*}
+\Delta(g)(\phi(X)(f))=\phi(Y)(g_{[1]}(g)(f))
+\end{align*}であればよい。
+右上を通って$\Delta(Y)$にうつした$\Delta(g)(\phi(X)(f))$を計算すると
+\begin{align*}
+\phi(X)(f)=(f(0), f(1))\in\Delta(X)=X\times X
+\end{align*}
+であり、
+\begin{align*}
+\Delta(g)(f(0),f(1))=(g(f(0)),g(f(1)))
+\end{align*}
+である。
+一方で、左下を通って$\Delta(Y)$にうつした$\phi(Y)(g_{[1]}(g)(f))$を計算すると、
+\begin{align*}
+\phi(Y)(g_{[1]}(g)(f))= (g_{[1]}(g)(f)(0),g_{[1]}(g)(f)(1))=((g\circ f)(0), (g\circ f)(1))=(g(f(0)), g(f(1)))
+\end{align*}
+となる。
+つまり、上の図式が可換であることがわかり、これにより$\phi(X)$たちが自然変換$g_{[1]} \to \Delta$を与えていることがわかった。
+
+この逆の自然変換$\Delta \to g_{[1]}$についても同様に与えることができるので、考えてみてほしい。
+
+\section{直積}
+二つの集合$X, Y$の直積$X \times Y$について、\emph{自然に}二つの写像$\pr_1:X \times Y \to X, \pr_2:X \times Y \to Y$が定まる。
+これらはそれぞれ対の左側の要素、右側の要素を取り出す写像である。
+
+また$X \times Y$と$Y \times X$は左右の成分を入れ替えることで\emph{自然に}同一視できる。
+これらのことについて、以下でふた通りの方法で見てみよう。
+
+\vspace{10pt}
+
+$\Sets$の対象、すなわち集合$X$を固定して考える。
+$X$との直積を取る関手$L_X:Y \mapsto X \times Y$と恒等関手$\id:Y \mapsto Y$はいずれも関手$\Sets \to \Sets$を与える。
+$\Sets$の各対象$Y$に対して$\pr_2(Y):L_X(Y) \to \id(Y)$という写像を$(x,y) \in L_X(Y)=X\times Y$に対して$\pr_2(Y)(x,y)=y$として定める。
+すると、$\Sets$の射$g:Y \to Z$に対して次の図式が可換になる。
+\[
+\begin{CD}
+L_X(Y)@>\pr_1(X)>>\id(Y)\\
+@VL_X(f)VV@V\id(f)VV\\
+L_X(Z)@>\pr_1(Z)>>\id(Z)
+\end{CD}
+\]
+この図式が可換になることを確かめてみよう。
+$(x,y) \in L_X(Y)=X\times Y$をとる。
+まず右上を通ると、
+\begin{align*}
+\id(f)(\pr_2(X)(x,y))=\id(f)(y)=f(y)
+\end{align*}
+であり、左下を通ると
+\begin{align*}
+\pr_2(Z)(L_X(f)(x,y))=\pr_2(Z)(x,f(y))=f(y)
+\end{align*}
+となるので、二つの写像の合成は一致し、図式は可換である。
+したがって$\pr_2(Y)$たちが自然変換$\pr_2:L_X \to \id$を与える。
+これが自然に$\pr_2:X \times Y \to Y$が定まる、ということの一つの解釈である。
+
+また、$X$に対して、$X$との直積を取る関手$R_X:Y \mapsto Y \times X$と恒等関手$\id:Y \mapsto Y$はいずれも関手$\Sets \to \Sets$を与える。
+この二つの間には$\pr_1(Y):L_X(Y) \to \id(Y)$という写像が存在し、次の図式が可換になることが上と同様にわかる。
+\[
+\begin{CD}
+F(x)@>\phi(x)>>G(x)\\
+@VF(f)VV@VG(f)VV\\
+F(y)@>\phi(y)>>G(y)
+\end{CD}
+\]
+したがって$\pr_1(Y)$たちが自然変換$\pr_1:L_X \to \id$を与える。
+これが自然に$\pr_1:X \times Y \to Y$が定まる、ということの一つの解釈である。
+
+最後に$X \times Y$と$Y \times X$が自然に同一視できるということについても、同様に自然変換を用いた解釈を与えよう。
+$\Sets$の対象$X$を固定し、上と同様に$X$と直積をとる関手$L_X:Y \mapsto X \times Y$と$R_X:Y \mapsto Y \times X$を考える。
+これは$\Sets$から$\Sets$への関手である。
+
+$\Sets$の対象$Y$に対して、
+$L_X(Y)=X\times Y$と$R_X(Y)=Y \times X$の間に写像$t(Y):L_X(Y)=X \times Y \to R_X(Y)=Y \times X$を$(x,y) \mapsto (y,x)$により定める。
+このとき、$f:Y\to Z$対して次が可換となることを確かめよう。
+\[
+\begin{CD}
+L_X(Y)@>t(Y)>>R_X(Y)\\
+@VL_X(f)VV@VR_X(f)VV\\
+L_X(Z)@>t(Z)>>R_X(Z)
+\end{CD}
+\]
+$(x,y) \in L_X(Y)=X\times Y$をとる。
+まず右上を通ると、
+\begin{align*}
+R_X(f)(r(Y)(x,y))=R_X(f)(y,x)=(f(y),x)
+\end{align*}
+であり、左下を通ると
+\begin{align*}
+t(Z)(L_X(f)(x,y))=t(Z)(x,f(y))=(f(y),x)
+\end{align*}
+となるので、二つの写像の合成は一致し、図式は可換である。
+したがって$t(Y)$たちが自然変換$t:L_X \to R_X$を与えることがわかった。
+これの逆の自然変換$R_X \to L_X$も同様に構成でき、$X \times Y$と$Y \times X$が自然に同一視できるということが自然変換を用いて説明できる。
+
+\vspace{10pt}
+上の説明では集合$X$を一つ固定していることに不満がある。
+実際にはこの$X$もいろいろ取り替えて直積を考えることになるので、それも捉えられるように別の定式化を与えよう。
+
+集合二つ組のなす圏を$\Sets^{[1]}$と書くことにする。
+つまり、
+\begin{itemize}
+\item 対象の集合$\Ob(\Sets^{[1]})$を集合二つ組$(X_0,X_1)$全てを集めたもの
+\item 射の集合$\Hom_{\Sets^{[1]}}((X_0,X_1),(Y_0,Y_1))$を写像二つ組$(f_0:X_0 \to Y_0, f_1:X_1\to Y_1)$全てを集めたもの
+\end{itemize}
+として定義する。
+射の合成や恒等射は集合の射の合成や恒等射から定まるものとする。
+
+集合の二つ組からその直積をとるという関手$\times:\Sets^{[1]} \to \Sets$を
+\begin{itemize}
+\item 対象の対応を集合二つ組$(X_0,X_1)$に対してその直積$X_0 \times X_1$を対応させる、つまり$\times(X_0,X_1)=X_0\times X_1$
+\item 射の対応を写像の組$(f_0,f_1):(X_0,X_1) \to (Y_0,Y_1)$に対して、$f_0\times f_1(x_0,x_1)=(f_0(x_0),f_1(x_1))$で定まる写像$f_0\times f_1:X_0 \times X_1 \to Y_0 \times Y_1$を対応させる、つまり$\times(f_0,f_1)=f_0\times f_1$
+\end{itemize}
+により定める。
+
+集合の二つ組から一つ目の集合をとるという関手$\pr_1:\Sets^{[1]} \to \Sets$を
+\begin{itemize}
+\item 対象の対応を集合二つ組$(X_0,X_1)$に対して一つ目の集合$X_0$を対応させる、つまり$\pr_1(X_0,X_1)=X_0$
+\item 射の対応を写像の組$(f_0,f_1):(X_0,X_1) \to (Y_0,Y_1)$に対して、一つ目の写像$f_0:X_0\to Y_0$を対応させる、つまり$\pr_1(f_0,f_1)=f_0$
+\end{itemize}
+により定める。
+
+集合の二つ組から二つ目の集合をとるという関手$\pr_2:\Sets^{[1]} \to \Sets$を
+\begin{itemize}
+\item 対象の対応を集合二つ組$(X_0,X_1)$に対して二つ目の集合$X_1$を対応させる、つまり$\pr_2(X_0,X_1)=X_1$
+\item 射の対応を写像の組$(f_0,f_1):(X_0,X_1) \to (Y_0,Y_1)$に対して、二つ目の写像$f_1:X_1\to Y_1$を対応させる、つまり$\pr_2(f_0,f_1)=f_1$
+\end{itemize}
+により定める。
+
+集合の二つ組の順番を入れ替えるという関手$tr:\Sets^{[1]} \to \Sets^{[1]}$を
+\begin{itemize}
+\item 対象の対応を集合二つ組$(X_0,X_1)$に対して集合の二つ組$(X_1,X_0)$を対応させる、つまり$tr(X_0,X_1)=(X_1,X_0)$
+\item 射の対応を写像の組$(f_0,f_1):(X_0,X_1) \to (Y_0,Y_1)$に対して、写像の組$(f_1,f_0)$を対応させる、つまり$tr(f_0,f_1)=(f_0,f_1)$
+\end{itemize}
+により定める。
+
+これらの関手の間に以下のようにして自然変換を定めることができる。
+$\Sets^{[1]}$の対象$(X_0, X_1)$に対して、写像$\pr_1(X_0,X_1):X_0 \times X_1 \to X_0$を$(x_0, x_1) \mapsto x_0$とすることで、自然変換$\pr_1:\times \to \pr_1$を定める
+
+$\Sets^{[1]}$の対象$(X_0, X_1)$に対して、写像$\pr_2(X_0,X_1):X_0 \times X_1 \to X_1$を$(x_0, x_1) \mapsto x_1$とすることで、自然変換$\pr_2:\times \to \pr_2$を定める。
+
+また$tr$と$\times$を合成して得られる関手$\Sets^{[1]} \to \Sets$と$\times$の間の自然変換$t:\times \to \times \circ tr$を、
+$\Sets^{[1]}$の対象$(X_0, X_1)$に対して、写像$tr(X_0,X_1):X_0 \times X_1 \to X_1 \times X_0$を$(x_0, x_1) \mapsto (x_1,x_0)$とすることで定める。
+
+これらが確かに自然変換になっているということ、つまり次の形の図式
+\[
+\begin{CD}
+F(x)@>\phi(x)>>G(x)\\
+@VF(f)VV@VG(f)VV\\
+F(y)@>\phi(y)>>G(y)
+\end{CD}
+\]
+を可換にすることは前半で述べたのと同様に示すことができる。
+
+
+\section{グラフとその間の射}
+有向グラフは関手$\Gamma \to \Sets$であることは前に述べたが、ここでは有向グラフの間の射が自然変換であるということをみる。
+
+$\Gamma$を以前定義した圏
+\[
+\begin{tikzcd}
+e \ar[r,shift left, "s"] \ar[r, shift right, "t"'] & v
+\end{tikzcd}
+\]
+とする。
+
+関手$F\colon\Gamma\to \Sets$は有向グラフに対応するものであることは以前にみた。
+関手$F$が定めるデータは
+\begin{itemize}
+\item 集合$F(e), F(v)$
+\item 写像$F(s)\colon F(e)\to F(v), F(t)\colon F(e)\to F(v)$
+\end{itemize}
+である。
+
+次に有向グラフの間の射はどのようなものであるか。
+これは頂点を頂点にうつし、辺を辺にうつし、各辺の始点と終点はうつり先でも始点と終点になっているものである。
+
+たとえば、
+
+つまり、関手$F_1:\Gamma \to \Sets$と$F_2:\Gamma \to \Sets$の間の射$\phi:F_1 \to F_2$とは、
+\begin{itemize}
+\item 点の間の写像$\phi(v):F_1(v) \to F_2(v)$
+\item 辺の間の写像$\phi(e):F_1(e) \to F_2(e)$
+\end{itemize}
+の組であり、
+\begin{itemize}
+\item 辺$x \in F_1(e)$をうつした$\phi(e)(x)$の始点$F_2(s)(\phi(e)(x))$が、$x$の始点$F_1(s)(x)$を$\phi(v)$でうつした$\phi(v)(F_1(s)(x))$と一致
+\item 辺$x \in F_1(e)$をうつした$\phi(e)(x)$の終点$F_2(t)(\phi(e)(x))$が、$x$の終点$F_1(t)(x)$を$\phi(v)$でうつした$\phi(v)(F_1(t)(x))$と一致
+\end{itemize}
+つまり、
+\begin{align*}
+F_2(s)(\phi(e)(x))=\phi(v)(F_1(s)(x))\\
+F_2(t)(\phi(e)(x))=\phi(v)(F_1(t)(x))
+\end{align*}
+となるものである。
+
+これを言い換えると、以下の図式が可換になるような射の組み$\phi(v), \phi(e)$である。
+\begin{multicols}{2}
+\begin{align*}
+\begin{CD}
+F_1(e)@>\phi(e)>>F_2(e)\\
+@VF_1(s)VV@VF_2(s)VV\\
+F_1(v)@>\phi(v)>>F_2(v)
+\end{CD}
+\end{align*}
+
+\begin{align*}
+\begin{CD}
+F_1(e)@>\phi(e)>>F_2(e)\\
+@VF_1(t)VV@VF_2(t)VV\\
+F_1(v)@>\phi(v)>>F_2(v)
+\end{CD}
+\end{align*}
+\end{multicols}
+つまり、$\phi$は自然変換$F_1 \to F_2$を与えている。
+
+\section{冪集合}
+ここでは冪集合により定まる関手$P:\Sets^{\rm op}\to\Sets$を考える。
+この関手と$[1]$が定める関手$h_{[1]}$が自然に同一視できること、また補集合や合併、共通部分といった操作が自然変換として解釈できることを見ていく。
+
+\vspace{10pt}
+
+まず関手$P:\Sets^{\rm op}\to\Sets$について復習する。
+これは、
+\begin{itemize}
+\item 対象の対応を集合$X$に対してその冪集合$P(X)$を対応させる
+\item 射の対応を写像$f:X\to Y\in\Hom_{\Sets^{\rm op}}(Y,X)$に$P(f):P(Y)\to P(X)\in\Hom_{\Sets}(P(X),P(Y))$を対応させる
+\end{itemize}
+によって定まるものであった。
+
+$\Sets$の対象$[1]=\{0,1\}$が定める関手$h_{[1]}:\Hom(X,[1])$とは、
+\begin{itemize}
+\item 対象の対応を$X \mapsto \Hom(X,[1])$に対応させる
+\item 射の対応を$f:X \to Y$に対して、$f$を合成するという写像$f^*:\Hom(Y,[1]) \to \Hom(X,[1]);g \mapsto f\circ g$に対応させる
+\end{itemize}
+によって定まるものだった。
+
+この二つの関手の間の自然変換$\phi:P \to h_{[1]}$と$\psi:h_{[1]} \to P$を以下で定義しよう。
+
+\vspace{5pt}
+
+まず$X$の部分集合$A \subset X$から写像$\chi_A:X \to [1]$を
+\begin{align*}
+\chi_A(x)=\begin{cases} 1 & x \in A\\ 0 & x \notin A\end{cases}
+\end{align*}
+で定める。このような写像を$A$の特性関数という。
+写像$\phi(X):P(X) \to h_{[1]}(X)$を部分集合$A \subset X$に対してその特性関数$\chi_A:X \to [1]$を対応させることにより定める。
+このとき、$\Sets$の射$f:Y \to X$に対し図式
+\begin{align*}
+\begin{CD}
+P(Y)@>\phi(Y)>>h_{[1]}(Y)\\
+@VP(f)VV@Vh_{[1]}(f)VV\\
+P(X)@>\phi(X)>>h_{[1]}(X)
+\end{CD}
+\end{align*}
+が可換になることを確かめよう。
+
+$A \in P(Y)$すなわち部分集合$A\subset Y$をとる。
+右上を通って$P(X)$にうつすと、まず$\phi(Y)(A)$は特性関数$\chi_A:Y \to [1]$であり、
+これに対して$h_{[1]}(f)(\chi_A)=\chi_A\circ f:X \to [1]$は
+\begin{align*}
+\chi_A\circ f(x)=\begin{cases} 1 & f(x) \in A\\ 0 & f(x) \notin A\end{cases}
+\end{align*}
+で定まる写像である。
+
+一方で左下を通って$P(X)$にうつすと、まず$P(f)(A)=f^{-1}(A)=\{x\in X\mid f(x) \in A\}$であり、
+$\phi(X)(P(f)(A))$は$P(f)(A)$の特性関数
+\begin{align*}
+\chi_{P(f)(A)}(x)=\begin{cases} 1 & x \in P(f)(A)\\ 0 & x \notin P(f)(A)\end{cases}
+\end{align*}
+である。
+
+$P(f)(A)$の定義から$x\in P(f)(A)$であることと$f(x) \in A$であることが同値なため、二つの写像$\chi_A \circ f$と$\chi_{P(f)(A)}$は一致し
+、上の図式が可換であることがわかる。
+\vspace{5pt}
+
+逆に$\psi(X):h_{[1]}(X) \to P(X)$を次のようにして定める。
+写像$f:X \to [1]$を決めるということは$X$の要素を$0$にうつる要素と$1$にうつる要素の二つに分けるということである。
+そこで写像$f:X \to [1]$に対して部分集合を$1$にうつる要素全体$f^{-1}(1)=\{x \in X \mid f(x)=1\} \subset X$を対応させることにより、写像$\psi(X):h_{[1]}(X) \to P(X)$を定めよう。
+つまり$\psi(X)(f)=f^{-1}(1)$としよう。
+このとき、$\Sets$の射$f:Y \to X$に対して図式
+\begin{align*}
+\begin{CD}
+h_{[1]}(Y)@>\psi(Y)>>P(Y)\\
+@Vh_{[1]}(f)VV@VP(f)VV\\
+h_{[1]}(X)@>\psi(X)>>P(X)
+\end{CD}
+\end{align*}
+が可換になることを確かめれば、これが自然変換を与えることがわかる。
+
+$g \in h_{[1]}(Y)$すなわち写像$g:Y \to [1]$をとる。
+右上を通って$P(X)$にうつすと、まず$\psi(Y)(g)=g^{-1}(1)$であり、
+\begin{align*}
+P(f)(g^{-1}(1))=f^{-1}(g^{-1}(1))=\{x \in X \mid f(x) \in g^{-1}(1)\}=\{x \in X \mid g(f(x))=1\} \in P(X)
+\end{align*}
+となる。
+
+一方で左下を通って$P(X)$にうつすと、
+$h_{[1]}(f)(g)=g\circ f:X \to [1]$であり、
+\begin{align*}
+\psi(X)(g\circ f)=(g\circ f)^{-1}(1)=\{x \in X \mid (g\circ f)(x) = 1\}
+\end{align*}
+となることから、二つの部分集合が一致し、図式が可換であることがわかる。
+
+\vspace{5pt}
+
+以上のことから、これらが二つの関手の間の自然変換を与え、しかも互いに逆になっていることがわかる。
+
+\vspace{10pt}
+集合$X$に対して、その部分集合の補集合をとる操作は写像$c(X):P(X)\to P(X)$を定める。
+これは実は関手$P$から$P$への自然変換$c:P \to P$を与えることがわかる。
+このとき、$\Sets$の射$f:X \to Y$に対して以下の図式
+\begin{align*}
+\begin{CD}
+P(Y)@>c(Y)>>P(Y)\\
+@VP(f)VV@VP(f)VV\\
+P(X)@>c(X)>>P(X)
+\end{CD}
+\end{align*}
+が可換であることが確かめよう。
+
+$A \in P(Y)$すなわち部分集合$A\subset Y$をとる。
+右上を通って$P(X)$にうつすと、まず$c(Y)(A)=Y \setminus A$であり、
+これに対して$P(f)(Y\setminus A)=\{x \in X \mid f(x) \in Y \setminus A\}$である。
+
+一方で左下を通って$P(X)$にうつすと、まず$P(f)(A)=\{x \in X \mid f(x) \in A\}$であり、
+$c(X)(P(f)(A))=X \setminus P(f)(A)=\{x \in X \mid x \notin P(f)(A)\}=\{x \in X \mid f(x) \notin A\} $である。
+このことから、二つの部分集合が一致し、図式が可換であることがわかる。
+
+\vspace{10pt}
+先に述べたように、$P$と$h_{[1]}$は同一視できる。
+この同一視により、補集合を取るという自然変換$c:P \to P$を自然変換$c:h_{[1]} \to h_{[1]}$と見ることができる。
+実は$0$と$1$を入れ替える写像$i:[1] \to [1]$から定まる自然変換$h_i:h_{[1]} \to h_{[1]}$こそが、上の自然変換$c:h_{[1]} \to h_{[1]}$であることがわかる。
+このことについては、次回の米田の補題に関連してより詳しく説明します。
+
+
+\section{関手の圏}
+ここまでの例で何度もでてきたが、改めて自然変換の定義を与えることにしよう。
+
+\begin{dfn}
+圏$C, D$の間の関手$F:C \to D$と$G:C \to D$の間の自然変換とは、
+$C$の各対象$x$に対して定まる$C$の射$\phi(x):F(x)\to G(x)$の集まり$\phi=(\phi(x))_x$であって、
+任意の$C$の射$f:x\to y$に対し$G(f)\circ\phi(x)=\phi(y)\circ F(f)$となる、つまり次の図式が可換になるもの。
+\[
+\begin{CD}
+F(x)@>\phi(x)>>G(x)\\
+@VF(f)VV@VG(f)VV\\
+F(y)@>\phi(y)>>G(y)
+\end{CD}
+\]
+\end{dfn}
+
+実は、自然変換を用いて、関手の圏を定義することができる。
+与えられた二つの圏$C, D$から、新しく圏$C^D$を対象が関手たち、射が自然変換たちであるようにして定める。
+\begin{dfn}
+圏$C, D$にたいし、圏$C^D$を
+\begin{itemize}
+\item 対象は関手$F:D\to C$
+\item 射$\phi:F\to G$は$C$の各対象$x$に対して定まる$C$の射$\phi(x):F(x)\to G(x)$の集まり$\phi=(\phi(x))_x$であって、任意の$C$の射$f:x\to y$に対し$G(f)\circ\phi(x)=\phi(y)\circ F(f)$となる、つまり次の図式が可換になるもの。
+\end{itemize}
+\[
+\begin{CD}
+F(x)@>\phi(x)>>G(x)\\
+@VF(f)VV@VG(f)VV\\
+F(y)@>\phi(y)>>G(y)
+\end{CD}
+\]
+\end{dfn}
+
+ここまでの例で言えば、$g_{[0]}$は$\Sets^{\Sets}$の対象である。
+直積を定める関手は$L_X, R_X$は$\Sets^{\Sets}$の対象であり、$t:L_X \to R_X$は$\Sets^{\Sets}$の射である。
+$\times, \pr_1, \pr_2$は$\Sets^{\Sets^{[1]}}$の対象であり、$tr$は$(\Sets^{[1]})^{\Sets^{[1]}}$の対象である。
+
+有向グラフは$\Sets^\Gamma$の対象であり、有向グラフの射は$\Sets^\Gamma$の射である。
+
+また、冪集合を取る関手$P$は$\Sets^{\Sets^{\rm op}}$の対象であり、また$h_{[1]}$も同じく$\Sets^{\Sets^{\rm op}}$の対象である。
+上の例でみた自然変換$\phi, \psi$は$\Sets^{\Sets^{\rm op}}$の射である。
+\end{document}

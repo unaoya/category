@@ -1,0 +1,852 @@
+\documentclass[uplatex]{jsarticle}
+\RequirePackage{amsmath,amssymb,amsthm, amscd, comment, multicol}
+\usepackage[all]{xy}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{tikz-cd}
+\input{../../tex/theorems}
+\input{../../tex/symbols}
+
+\title{米田の補題と表現可能関手}
+\author{@unaoya}
+\date{\today}
+\begin{document}
+
+\maketitle
+ここでは米田の補題についてその主張と証明を紹介します。
+
+まずは自然変換と関手の圏について復習します。
+詳しくは前節に書いてあるので、そちらも合わせてお読みください。
+
+次に表現可能関手を定義し、米田の補題の主張を紹介します。
+
+さらに、数直線上の関数から定まる関手の例を用いて、米田の補題がどのようなことを主張しているのか見てみます。
+
+その後、米田の補題を証明します。
+できるだけ式変形を丁寧に説明しましたが、逆に長く読みづらくなってしまったかもしれません。
+
+最後に、冪集合関手について米田の補題を応用することで、ドモルガンの定理を証明します。
+ここでも具体例を通して米田の補題の証明に触れるので、上の証明がわかりづらい場合にも具体例と合わせてお読みいただくとよいと思います。
+
+\section{自然変換}
+自然変換というのは、圏$C, D$の間の二つの関手$F, G$を結びつけるものであった。
+
+\begin{dfn}
+圏$C, D$の間の関手$F:C \to D$と$G:C \to D$を考える。
+これに対して$F$と$G$の間の自然変換とは、
+\begin{itemize}
+\item $C$の各対象$x$に対して定まる$C$の射$\phi(x):F(x)\to G(x)$の集まり$\phi=(\phi(x))_x$
+\end{itemize}
+であって、任意の$C$の射$f:x\to y$に対し$G(f)\circ\phi(x)=\phi(y)\circ F(f)$となる、つまり次の図式
+\[
+\begin{CD}
+F(x)@>\phi(x)>>G(x)\\
+@VF(f)VV@VG(f)VV\\
+F(y)@>\phi(y)>>G(y)
+\end{CD}
+\]
+が可換になるもの。
+\end{dfn}
+
+\begin{eg}
+自然変換の例として、冪集合を与える関手$P:\Sets^{\rm op} \to \Sets$と集合$[1]=\{0,1\}$が定める関手$h_{[1]}=\Hom(-,[1]):\Sets^{\rm op} \to \Sets$の間の自然変換がある。
+
+まず、関手$P$は
+\begin{itemize}
+\item 集合$X$に対しその部分集合全体$P(X)=\{A \subset X\}$を対応させる
+\item 写像$f:X \to Y$から逆像により定まる写像$P(f):P(Y) \to P(X)$を対応させる
+\end{itemize}
+ことで定まるもの。
+ここで$B \subset Y$の$f$による逆像とは$f^{-1}(B)=\{x \in X, f(x)\in B\}$のことである。
+つまり$f:X \to Y$の$P$により定まる写像$P(f)$は$P(f)(B)= f^{-1}(B)$で定まるものである。
+次に、関手$h_{[1]}$は
+\begin{itemize}
+\item 集合$X$に対して$X$から$[1]$への写像全体のなす集合$\Hom(X,[1])=\{f:X \to [1]\}$を対応させる
+\item 写像$f:X \to Y$に対して$g \mapsto g \circ f$により定まる写像$\Hom(Y,[1]) \to \Hom(X,[1])$を対応させる
+\end{itemize}
+ことで定まるもの。
+
+集合$h_{[1]}(X)$の特別な元として特性関数がある。
+これは$X$の部分集合$A$を用いて定義される写像$X \to [1]$で、
+\begin{align*}
+\chi_A(x)=\begin{cases}1 & (x\in A) \\ 0 & (x\notin A)\end{cases}
+\end{align*}
+で定まるものである。
+
+この特性関数を用いて、上の二つの関手$P, h_{[1]}$の間の自然変換を定めよう。
+
+まず各集合$X$に対して写像$\phi(X):P(X) \to \Hom(X,[1])$を
+\begin{align*}
+\phi(X)(A) = \chi_A
+\end{align*}
+により定める。
+
+このとき、集合$X, Y$と写像$f:X \to Y$に対して図式
+\[
+\begin{CD}
+P(Y)@>\phi(y)>>h_{[1]}(Y)\\
+@VP(f)VV@Vh_{[1]}(f)VV\\
+P(X)@>\phi(x)>>h_{[1]}(X)
+\end{CD}
+\]
+が可換になることが以下のようにわかる。
+各$A \subset Y$に対して、$x\in f^{-1}(A)$であることと$f(x)\in A$であることが同値であることを使うと、
+写像$X \to [1]$としての等式
+\begin{align*}
+\phi(X)P(f)(A)=\chi_{f^{-1}(A)}=\chi_A\circ f=h_{[1]}(f)(\phi(Y)(A))
+\end{align*}
+が成立する。
+\end{eg}
+
+
+次に二つの圏$C, D$について、$C$から$D$への関手全体のなすの圏について復習しよう。
+これは対象が関手、射が自然変換として定まる圏である。
+\begin{dfn}
+圏$C, D$にたいし、圏$C^D$を
+\begin{itemize}
+\item 対象は関手$F:D\to C$
+\item 射$\phi:F\to G$は$F$から$G$への自然変換。つまり、$C$の各対象$x$に対して定まる$C$の射$\phi(x):F(x)\to G(x)$の集まり$\phi=(\phi(x))_x$であって、任意の$C$の射$f:x\to y$に対し$G(f)\circ\phi(x)=\phi(y)\circ F(f)$となる、つまり次の図式が可換になるもの。
+\end{itemize}
+\[
+\begin{CD}
+F(x)@>\phi(x)>>G(x)\\
+@VF(f)VV@VG(f)VV\\
+F(y)@>\phi(y)>>G(y)
+\end{CD}
+\]
+ここで、自然変換$\phi:F \to G$と$\psi:G\to H$の合成は、$(\psi\circ\phi)(x)=\psi(x)\circ \phi(x)$により与えられる。
+以下の図式で、一番外側の長方形が可換であることは小さい正方形が可換であることから言える。
+\[
+\begin{CD}
+F(x)@>\phi(x)>>G(x)@>\psi(x)>>H(x)\\
+@VF(f)VV@VG(f)VV@VH(f)VV\\
+F(y)@>\phi(y)>>G(y)@>\psi(y)>>H(y)
+\end{CD}
+\]
+また、恒等射$\id_F$はそれぞれの$x$について$\id_F(x)=\id_{F(x)}$とすれば定まる。
+\end{dfn}
+
+上の例で与えた$P, h_{[1]}$はいずれも$\Sets^{C^{\rm op}}$の対象であり、
+特性関数を用いて定めた自然変換は$\Sets^{C^{\rm op}}$の射である。
+
+\section{表現可能関手}
+圏$C$の対象$x$から関手$h_x:C^{\rm op} \to \Sets$を定めることができる。
+この関手は
+\begin{itemize}
+\item 対象の対応が$y \mapsto \Hom_C(y,x)$
+\item 射の対応が$C$の射$f:y \to z$に対して$h_x(f):h_x(z) \to h_x(y)$
+\end{itemize}
+により定まるものである。
+
+\begin{dfn}
+関手$F:C^{\rm op}\to\Sets$が表現可能とは、ある$C$の対象$x$に対して$F$と$h_x$が同型になることをいう。
+ここで同型というのは関手の圏$\Sets^{C^{\rm op}}$においての同型ということであり、
+すなわち自然変換$\phi:F \to h_x$と$\psi:h_x \to F$が存在して$\phi\circ\psi=\id_{h_x}$と$\psi\circ\phi=\id_F$が成り立つことである。
+\end{dfn}
+
+\begin{eg}
+$P$は$[1]$により表現される関手$h_{[1]}$と同型になる、すなわち関手$P$は表現可能関手であることを確かめよう。
+
+まず上で定義した特性関数を用いた写像$\phi(X):P(X) \to h_{[1]}(X),  \phi(X)(A) = \chi_A$により、自然変換$\phi:P \to h_{[1]}$が定まる。
+
+これと逆向きの自然変換$\psi:h_{[1]} \to P$を定めよう。
+
+まず集合$X$に対して$\psi(X):h_{[1]}(X) \to P(X)$を次のようにして定める。
+$h_{[1]}$の元は写像$f:X \to [1]$であり、
+これに対して部分集合を$1$にうつる要素全体$f^{-1}(1)=\{x \in X \mid f(x)=1\} \subset X$を対応させる。
+つまり、
+\begin{align*}
+\psi(X)(f)=f^{-1}(1)
+\end{align*}
+としよう。
+
+このとき、$\Sets$の射$f:Y \to X$に対して図式
+\begin{align*}
+\begin{CD}
+h_{[1]}(Y)@>\psi(Y)>>P(Y)\\
+@Vh_{[1]}(f)VV@VP(f)VV\\
+h_{[1]}(X)@>\psi(X)>>P(X)
+\end{CD}
+\end{align*}
+が可換になることを確かめれば、これが自然変換を与えることがわかる。
+
+$g \in h_{[1]}(Y)$すなわち写像$g:Y \to [1]$をとる。
+右上を通って$P(X)$にうつすと、まず$\psi(Y)(g)=g^{-1}(1)$であり、
+\begin{align*}
+P(f)(g^{-1}(1))=f^{-1}(g^{-1}(1))=\{x \in X \mid f(x) \in g^{-1}(1)\}=\{x \in X \mid g(f(x))=1\} \in P(X)
+\end{align*}
+となる。
+
+一方で左下を通って$P(X)$にうつすと、
+$h_{[1]}(f)(g)=g\circ f:X \to [1]$であり、
+\begin{align*}
+\psi(X)(g\circ f)=(g\circ f)^{-1}(1)=\{x \in X \mid (g\circ f)(x) = 1\}
+\end{align*}
+となることから、二つの部分集合が一致し、図式が可換であることがわかる。
+
+この$\phi(X):P(X)\to h_{[1]}(X)=\Hom_{\Sets}(X,[1])$と$\psi(X):h_{[1]}(X)=\Hom_{\Sets}(X,[1])\to P(X)$が互いに逆であることを確かめる。
+
+まず$\psi(X)\circ\phi(X)$を計算する。
+$A \subset X$に対して、$\phi(X)(A)=\chi_A$であり、
+$x\in\chi^{-1}_X(1)$であることは$\chi_A(x)=1$であることと同値で、これは$x\in A$と同値なので、
+\begin{align*}
+\psi(X)(\chi_A)=\chi_A^{-1}(1)=A
+\end{align*}
+である。
+よって$\psi(X)\circ\phi(X)=\id_{P(X)}$である。
+
+次に$\phi(X)\circ\psi(X)$を計算する。
+$f:X\to [1]$に対して、$\psi(X)(f)=f^{-1}(1)$であり、
+$\chi_{f^{-1}(1)}(x)=1$であることは$x\in f^{-1}(1)$であることと同値で、これは$f(x)=1$であることと同値なので、
+\begin{align*}
+\phi(f^{-1}(1))=\chi_{f^{-1}(1)}=f
+\end{align*}
+である。
+よって$\phi(X)\circ\psi(X)=\id_{h_{[1]}(X)}$である。
+\end{eg}
+
+$C$の射$f:x \to y$があれば関手$h_x$と$h_y$の間の自然変換$h_f:h_x\to h_y$が次のようにして定まる。
+\begin{itemize}
+\item $C$の各対象$z$に対し写像$h_f(z):\Hom_C(z,x)=h_x(z)\to \Hom_C(z,y)=h_y(z)$を$g:z \to x$に対して$f\circ g:z \to y$を対応させるものとして与える
+\item $C$の射$g:z\to w$について写像の等式$h_f(z)\circ h_x(g)=h_y(g)\circ h_f(w)$、つまり次の図式
+\[
+\begin{CD}
+h_x(w)@>h_f(w)>>h_y(w)\\
+@Vh_x(g)VV@Vh_y(g)VV\\
+h_x(z)@>h_f(z)>>h_y(z)
+\end{CD}
+\]
+が可換になる。
+実際、$h:w\to x \in h_x(w)$に対して、左下にうつすと
+\begin{align*}
+h_x(g)(h)=h\circ g:z \to x
+\end{align*}
+となり、さらに右下にうつすと
+\begin{align*}
+h_f(z)(h_x(g)(h))=h_f(z)(h\circ g)=f\circ h \circ g:z \to y
+\end{align*}
+となる。
+一方、$h$を右上にうつすと
+\begin{align*}
+h_f(w)(h)=f\circ h:w \to y
+\end{align*}
+となり、さらに右下にうつすと
+\begin{align*}
+h_y(g)(h_f(w)(h))=h_y(g)(f\circ h)=f\circ h \circ g:z \to y
+\end{align*}
+となり、この二つは一致することから上の図式は可換であることがわかる。
+\end{itemize}
+
+これを用いて米田埋め込みと呼ばれる関手$C\to \Sets^{C^{\rm op}}$を定義しよう。
+\begin{dfn}[米田埋め込み]
+関手$Y_C:C\to \Sets^{C^{\rm op}}$を
+\begin{itemize}
+\item 対象$x$に対し関手$h_x$を対応させる
+\item $C$の射$f:x\to y$に自然変換$h_f:h_x\to h_y$を対応させる
+\end{itemize}
+ことで定義する。
+これを米田埋め込みという。
+\end{dfn}
+
+\vspace{5pt}
+
+これが埋め込みと言われる理由を説明するのが次の米田の補題である。
+簡単にいうと、圏$C$を圏$\Sets^{C^{\rm op}}$の中に埋め込んで調べることができるということを意味している。
+
+このことを理解するために、まずは$C$の対象$x$たちを埋め込んだ関手$h_x$たちと他の関手$F$の関係を調べよう。
+関手$F:C^{\rm op} \to \Sets$を一つ固定する。
+また関手$G:C^{\rm op} \to \Sets$を
+\begin{itemize}
+\item 対象$x$を集合$\Hom_{\Sets^{C^{\rm op}}}(h_x,F)$にうつす
+\item $C$の射$f:x\to y$を写像$(h_f)^*:\Hom_{\Sets^{C^{\rm op}}}(h_y,F)\to \Hom_{\Sets^{C^{\rm op}}}(h_x,F)$にうつす
+\end{itemize}
+により定義する。
+$(h_f)^*$の定義は複雑だが、これは自然変換$\phi:h_y \to F$を自然変換$h_f:h_x \to h_y$と合成して得られる自然変換$\phi\circ h_f$に対応させるものである。
+
+このとき、この関手$G$と元の関手$F$が自然同型になるというのが米田の補題である。
+つまり、$h_x$から$F$への自然変換は$F(x)$の要素と一対一に対応し、しかもこの対応は自然であるということを言っている。
+\begin{thm}[米田の補題]
+関手の同型$\phi:F\to G$が存在する。
+すなわち、$C$の任意の対象$x$に対して全単射$\phi(x):F(x) \to G(x)=\Hom(h_x,F)$が存在し、
+$C$の射$f:x \to y$に対して次の図式が可換になる。
+\[
+\begin{CD}
+F(y)@>\phi(y)>>G(y)=\Hom_{\Sets^{C^{\rm op}}}(h_y,F)\\
+@VF(f)VV@VG(f)VV\\
+F(x)@>\phi(x)>>G(x)=\Hom_{\Sets^{C^{\rm op}}}(h_x,F)
+\end{CD}
+\]
+\end{thm}
+
+実際に証明する前に、ごく簡単な例で米田の補題について考えてみよう。
+
+\begin{eg}
+数直線$\R$の開区間$I$に対し$F(I)$を$I$が定義域であるような実数値関数全体の集合とする。
+$f \in F(I)$と$J\subset I$に対し、$f$を$J$に制限することで$f\vert_J \in F(J)$が定まり、
+これにより写像$F(I) \to F(J)$を定めることができる。
+このようにして全ての$J \subset I$に対して一斉に$f\vert_J$を定めることができ、しかもこれらは互いに制限の関係$(f\vert_J)\vert_{J'}=f\vert_{J'}$になっている。
+
+逆に$I$に含まれる区間$J$全てに対して$f_J$が与えられていて、しかも$J\subset J'$について制限の関係$f_J\vert_{J'}=f_{J'}$になっていれば、これはある$I$上の関数を制限したものとして書くことができる。
+これはある意味では当たり前で、なぜなら$J=I$についての$f_I$が元の$f$を与える。
+つまり、
+\begin{align*}
+\phi(I):F(I) \to \{(f_J)_{J\subset I}\vert~ f_J\vert_{J'} = f_{J'}, \forall J' \subset J\}=G(J)
+\end{align*}
+が全単射であるということである。
+さらにこの全単射は制限$I'\subset I$について整合的である、つまり$J'\subset J$に対して図式
+\[
+\begin{CD}
+F(J)@>\phi(J)>>G(J)=\Hom_{\Sets^{C^{\rm op}}}(h_y,F)\\
+@VVV@VVV\\
+F(J')@>\phi(J')>>G(J)=\Hom_{\Sets^{C^{\rm op}}}(h_x,F)
+\end{CD}
+\]
+が可換である。
+これは特別な圏と関手についての米田の補題とみなすことができる。
+$C$を$\R$の開区間を対象とし、包含を射とする圏を考える。
+関手$F:C^{\rm op} \to \Sets$を$F(I)$を$I$上の実数値関数、射は制限で定める。
+$I$が表現する関手$h_I$は$J \subset I$に対しては一点集合、$J \not\subset I$に対しては空集合を与える関手$C^{\rm op} \to \Sets$である。
+このとき、自然変換$h_I \to F$とは、各開区間$J$に対して$J \subset I$について$h_I(J)=\{*\} \to F(J)$を与え、$J'\subset J$に対して次の図式が整合的になる。
+\[
+\begin{CD}
+h_I(J)@>\phi(y)>>F(J)\\
+@VVV@VVV\\
+h_I(J')@>\phi(x)>>F(J')
+\end{CD}
+\]
+写像$h_I(J) \to F(J)$を与えるのは$f_J\in F(J)$を一つ与えることと同じで、
+上の図式の可換性は$f_J\vert_{J'}=f_{J'}$であるということを主張する。
+したがって、米田の補題の同型は、上で与えた
+\begin{align*}
+F(I) \to \{(f_J)_{J\subset I}\vert~ f_J\vert_{J'} = f_{J'}, \forall J' \subset J\}
+\end{align*}
+が全単射であることと同じことを言っていることになる。
+\end{eg}
+
+\section{証明}
+
+二つの関手$F,G:C^{\rm op} \to \Sets$は同型、すなわち関手として自然同値であることを以下の手順に従って証明しよう。
+\begin{enumerate}
+\item 自然変換$\phi:F \to G$を定義する。
+\item 自然変換$\psi:G \to F$を定義する。
+\item $\phi$と$\psi$が互いに逆であることを確かめる。
+\end{enumerate}
+
+\begin{proof}
+上の手順に沿って証明を進めていく。
+\begin{enumerate}
+\item 自然変換$\phi:F\to G$を定義するため、
+\begin{enumerate}
+\item $C$の対象$x$に対して写像$\phi(x):F(x) \to G(x)$を定義
+\item $C$の射$g:x\to y$に対し図式
+\begin{align*}
+\begin{CD}
+F(y)@>\phi(y)>>G(y)=\Hom_{\Sets^{C^{\rm op}}}(h_y,F)\\
+@VF(f)VV@VG(f)VV\\
+F(x)@>\phi(x)>>G(x)=\Hom_{\Sets^{C^{\rm op}}}(h_x,F)
+\end{CD}
+\end{align*}
+が可換である
+\end{enumerate}
+ことを示す。
+\begin{enumerate}
+\item 写像$\phi(x):F(x)\to G(x)=\Hom_{\Sets^{C^{\rm op}}}(h_x,F)$を定めるため、
+各$a\in F(x)$に対して$G(x)$の元すなわち自然変換$\phi(x)(a):h_x\to F$を定める。
+\begin{enumerate}
+\item $C$の対象$y$について写像$(\phi(x)(a))(y):h_x(y)=\Hom_C(y,x)\to F(y)$を$f:y\to x$に対して$F(f):F(x)\to F(y)$による$a$の像$F(f)(a)\in F(y)$を対応させるものとする。つまり
+\begin{align}\label{phi_def}
+((\phi(x)(a))(y))(f)=F(f)(a)
+\end{align}
+である。
+\item これが$C$の射$g:y\to z$について以下の図式
+\begin{align}\label{phixa}
+\begin{CD}
+h_x(z)@>\phi(x)(a)(z)>>F(z)\\
+@Vh_x(g)VV@VF(g)VV\\
+h_x(y)@>\phi(x)(a)(y)>>F(y)
+\end{CD}
+\end{align}
+を可換にする、つまり
+\begin{align}\label{phixa_comm}
+(\phi(x)(a))(y)\circ h_x(g)=F(g)\circ(\phi(x)(a))(z)
+\end{align}
+を満たすことを確かめる。
+
+まず$f\in h_x(z)=\Hom_C(z,x)$をとる。
+左下にうつすと
+\begin{align*}
+h_x(g)(f) = f\circ g:y \to x
+\end{align*}であり、さらに右下にうつすと(\ref{phi_def})より
+\begin{align}\label{phixa_ld}
+(\phi(x)(a)(y))(h_x(g)(f))=(\phi(x)(a)(y))(f\circ g)=F(f\circ g)(a)
+\end{align}
+となる。
+
+一方、$f$を右上にうつすと
+\begin{align*}
+(\phi(x)(a)(z))(f) = F(f)(a)
+\end{align*}
+であり、さらに右下にうつすと
+\begin{align}\label{phixa_ru}
+F(g)((\phi(x)(a)(z))(f)) = F(g)(F(f)(a)) =(F(g)\circ F(f))(a)
+\end{align}
+となる。
+
+ここで$F$が$C^{\rm op}$から$\Sets$の関手であるから$F(g)\circ F(f)=F(f \circ g)$が成り立つ。
+これを使うと
+\begin{align*}
+(F(g)\circ F(f))(a)=F(f \circ g)(a)
+\end{align*}
+となるから(\ref{phixa_ld})と(\ref{phixa_ru})の右辺が等しく、(\ref{phixa_comm})が示せた。
+つまり図式(\ref{phixa})が可換であることがわかった。
+\end{enumerate}
+以上から$\phi(x)(a)$は自然変換であり、
+$C$の各対象$x$について$\phi(x):F(x)\to G(x)$という写像が定義できた。
+
+\item このように構成した$\phi(x)$たちが自然変換を定めることを見よう。$C$の射$g:x\to y$に対し図式
+\begin{align}\label{phi_comm}
+\begin{CD}
+F(y)@>\phi(y)>>G(y)=\Hom_{\Sets^{C^{\rm op}}}(h_y,F)\\
+@VF(g)VV@VG(g)VV\\
+F(x)@>\phi(x)>>G(x)=\Hom_{\Sets^{C^{\rm op}}}(h_x,F)
+\end{CD}
+\end{align}
+が可換になる、つまり$\phi(x)\circ F(g)=G(g)\circ\phi(y)$が成り立つことを確かめる。
+
+まず$a\in F(y)$をとる。
+この$a$を左下を通って右下にうつすと$\phi(x)(F(g)(a))$は自然変換$h_x\to F$であり、
+これは$C$の各対象$z$に対して写像$\phi(x)(F(g)(a))(z):h_x(z) \to F(z)$を(\ref{phi_def})により$f\in h_x(z)$に対して
+\begin{align}\label{phix_ld}
+(\phi(x)(F(g)(a))(z))(f)=F(f)(F(g)(a))
+\end{align}
+により定めるものである。
+
+一方、右上にうつすと$\phi(y)(a)$は自然変換$h_y \to F$であり、
+これは$C$の各対象$z$に対して写像$(\phi(y)(a))(z):h_y(z) \to F(z)$を(\ref{phi_def})により
+\begin{align*}
+(\phi(y)(a))(z)(f)=F(f)(a)
+\end{align*}
+により定めるものである。
+この$\phi(y)(a)$をさらに右下にうつす。
+$G(g)$は自然変換に$h_g$を合成することで定まる写像であることから、
+\begin{align*}
+G(g)(\phi(y)(a))=\phi(y)(a)\circ h_g
+\end{align*}
+である。
+これにより$C$の各対象$z$に対し、写像$(\phi(y)(a))(z)\circ h_g(z)$が$h_x(z) \to  F(z)$として、
+$h_y$の定義および(\ref{phi_def})を用いて
+\begin{align}\label{phix_ru}
+(\phi(y)(a))(z)\circ h_g(z)(f) = (\phi(y)(a))(z)(h_g(f))=(\phi(y)(a))(z)(g\circ f)=F(g\circ f)(a)
+\end{align}
+と計算できる。
+ここで$F$が$C^{\rm op}$から$\Sets$の関手であるから$F(g)\circ F(f)=F(f \circ g)$が成り立つ。
+これを使うと
+\begin{align*}
+(F(g)\circ F(f))(a)=F(f \circ g)(a)
+\end{align*}
+となり、(\ref{phix_ld})および(\ref{phix_ru})により
+\begin{align*}
+(\phi(x)(F(g)(a))(z))(f)=(\phi(y)(a))(z)\circ h_g(z)(f)
+\end{align*}
+となる。これがすべての$f\in h_x(z)$について成立するので、写像$h_x(z) \to F(z)$としての等式
+\begin{align*}
+(\phi(x)(F(g)(a))(z))=(\phi(y)(a))(z)\circ h_g(z)
+\end{align*}
+が成り立つ。
+さらに、これがすべての$C$の対象$z$について成立するので、自然変換$h_x \to F$としての等式
+\begin{align*}
+\phi(x)(F(g)(a))=(\phi(y)(a))\circ h_g=G(g)(\phi(y)(a))\\
+\end{align*}
+が成り立ち、図式(\ref{phi_comm})が可換であることがわかった。
+\end{enumerate}
+
+\item 自然変換$\psi:G\to F$を定義しよう。
+このために、
+\begin{enumerate}
+\item $C$の対象$x$に対して写像$\psi(x):G(x) \to F(x)$を定義し、
+\item $C$の射$f:y\to x$に対し図式
+\[
+\begin{CD}
+G(y)=\Hom_{\Sets^{C^{\rm op}}}(h_y,F)@>\psi(y)>>F(y)\\
+@VF(f)VV@VG(f)VV\\
+G(x)=\Hom_{\Sets^{C^{\rm op}}}(h_x,F)@>\psi(x)>>F(x)
+\end{CD}
+\]
+を可換にする
+\end{enumerate}
+ことを示す。
+\begin{enumerate}
+\item 写像$\psi(x):G(x)=\Hom_{\Sets^{C^{\rm op}}}(h_x,F)\to F(x)$を定める。
+$G(x)$の元$f$は$h_x$から$F$への自然変換なので、$C$の各対象$y$にたいし$f(y):h_x(y)\to F(y)$が定まっている。
+特に$y=x$として$f(x):h_x(x)=\Hom_C(x,x)\to F(x)$が取れるので、この写像を用いて
+$\id_x\in\Hom_C(x,x)$をうつすことで$\psi(x)$を定める。
+つまり
+\begin{align}\label{psi_def}
+\psi(x)(f)=f(x)(\id_x) \in F(x)
+\end{align}
+と定める。
+\item $C$の射$g:x\to y$に対し
+\begin{align}\label{psi_comm}
+\begin{CD}
+G(y)=\Hom_{\Sets^{C^{\rm op}}}(h_y,F)@>\psi(y)>>F(y)\\
+@VG(g)VV@VF(g)VV\\
+G(x)=\Hom_{\Sets^{C^{\rm op}}}(h_x,F)@>\psi(x)>>F(x)
+\end{CD}
+\end{align}
+が可換、すなわち
+\begin{align*}
+\psi(x)\circ G(g)=F(g)\circ\psi(y)\in F(x)
+\end{align*}
+を満たすことを確かめる。
+
+まず自然変換$f\in G(y)$をとる。
+これを左下にうつすと、自然変換$G(g)(f):h_x \to F$は$f:h_y \to F$と自然変換$h_g:h_x \to h_y$を合成したもの、つまり
+\begin{align*}
+G(g)(f)=f\circ h_g:h_x \to F
+\end{align*}
+である。
+
+これを右下に$\psi(x)$でうつすと(\ref{psi_def})より
+\begin{align}\label{psi_ld}
+\psi(s)(G(g)(f))=(f\circ h_g)(x)(\id_x)=f(x)\circ(h_g(x)(\id_x)
+\end{align}
+にうつる。
+
+一方で、$f$をまず右上にうつすと(\ref{psi_def})より
+\begin{align*}
+\psi(y)(f)=f(y)(\id_y)
+\end{align*}
+である。
+これをさらに$F(g)$で右下にうつした$F(g)(f(y)(\id_y))$を計算しよう。
+$f$は自然変換$h_y \to F$であるから、次の図式
+\[
+\begin{CD}
+h_y(y)@>f(y)>>F(y)\\
+@Vh_y(g)VV@VF(g)VV\\
+h_y(x)@>f(x)>>F(x)
+\end{CD}
+\]
+は可換であり、$f(x)\circ h_y(g)=F(g)\circ f(y)$が成り立つ。
+したがって
+\begin{align}\label{psi_ru}
+F(g)(f(y)(\id_y))=f(x)(h_y(g)(\id_y))
+\end{align}
+となる。
+
+ここで、$h_y$の定義より
+\begin{align*}
+h_y(g)(\id_y)=\id_y\circ g=g
+\end{align*}
+であり、$h_g$の定義より
+\begin{align*}
+h_g(x)(\id_x)=g\circ\id_x=g
+\end{align*}
+である。
+
+よって、(\ref{psi_ld})と(\ref{psi_ru})により図式(\ref{psi_comm})の可換性が証明できた。
+\end{enumerate}
+
+\item 二つの自然変換$\phi, \psi$が互いに逆であることを確かめよう。
+つまり$C$の各対象$x$に対し、$\phi(x)$と$\psi(x)$が$F(x)$と$G(x)$の間の逆写像を与えていることを確かめる。
+
+\begin{enumerate}
+\item $\phi(x)\circ\psi(x)$を計算する。
+$G(x)=\Hom_{\Sets^{C^{\rm op}}}(h_x,F)$の元$f$をとる。
+$f$は$h_x$から$F$への自然変換であり、(\ref{psi_def})から
+\begin{align*}
+\psi(x)(f)=f(x)(\id_x)\in F(x)
+\end{align*}
+である。
+さらに$\phi(x)(\psi(x)(f))=\phi(x)(f(x)(\id_x))$は自然変換$h_x \to F$である。
+この自然変換が元の$f$と一致することを確かめよう。
+これは、$C$の各対象$y$について写像$h_x(y) \to F(y)$として一致すればよく、
+$g\in h_x(y)=\Hom_C(y,x)$に対して(\ref{phi_def})より
+\begin{align*}
+(\phi(x)\psi(x)(f))(y)(g)=\phi(x)(f(x)(\id_x))(y)(g)=F(g)(f(x)(\id_x))
+\end{align*}
+である。
+ここで$f$が自然変換であるから図式
+\[
+\begin{CD}
+h_x(x)@>f(x)>>F(x)\\
+@Vh_x(g)VV@VF(g)VV\\
+h_x(y)@>f(y)>>F(y)
+\end{CD}
+\]
+が可換である。
+したがって
+\begin{align*}
+F(g)(f(x)(\id_x))=f(y)(h_x(g))(\id_x)=f(y)(g)
+\end{align*}
+となり
+\begin{align*}
+(\phi(x)\psi(x)(f))(y)(g)=f(y)(g)
+\end{align*}
+である。
+
+これが各$g\in h_x(y)$について成り立つので$h_x(y) \to F(y)$として
+\begin{align*}
+\phi(x)\psi(x)(f)(y)=f(y)
+\end{align*}
+であり、
+これが$C$の各対象$y$について成り立つので
+\begin{align*}
+\phi(x)\psi(x)(f)=f=\id_{G(x)}(f)=\id_G(x)(f)
+\end{align*}
+である。
+これが各$f, x$について成り立つので、自然変換として$\phi\circ\psi=\id_G$である。
+
+\item $\psi(x)\circ\phi(x)$を計算する。
+$F(x)$の元$a$をとる。
+$\phi(x)(a)$は自然変換$h_x \to F$である。
+これを$\psi(x)$でうつすと、(\ref{psi_def})と(\ref{phi_def})により
+\begin{align*}
+\psi(x)(\phi(x)(a))=(\phi(x)(a))(x)(\id_x)=F(\id_x)(a)
+\end{align*}
+であり、さらに$F$が関手であることから
+\begin{align*}
+F(\id_x)(a)=\id_{F(x)}(a)
+\end{align*}
+となる。
+
+したがって任意の$a\in F(x)$に対して
+\begin{align*}
+\psi(x)(\phi(x)(a))=\id_{F(x)}(a)
+\end{align*}
+であるので、写像$F(x)\to F(x)$として$\psi(x)\circ\phi(x)=\id_{F(x)}=\id_F(x)$であり、
+自然変換として$\psi\circ\phi=F$となる。
+\end{enumerate}
+
+以上から$\phi$と$\psi$が自然変換として互いに逆であることが証明できた。
+\end{enumerate}
+
+これにより$F$と$G$が$\Sets^{C^{\rm op}}$において同型であることが証明できた。
+\end{proof}
+
+このことから特に$F=h_y$とすると、
+\begin{thm}
+$Y_C:h_y(x)=\Hom_C(x,y)\to \Hom_{\Sets^{C^{\rm op}}}(h_x,h_y)$は全単射。
+\end{thm}
+であることがわかる。
+
+例えば圏$C$の対象$x,y$の間に射を定義したいとき、
+関手$h_x, h_y$の間に射を定義すればよいということが上の定理から言える。
+一般的には圏$C$の射を定義するよりは関手の間に射を定義する方がやさしい。
+なぜなら、$h_x, h_y$は集合に値を持つ関手なので、射の定義を集合の言葉で書くことができるからである。
+また、それらの射が一致することも、$h_x, h_y$の射として一致することを確かめればよいことも主張している。
+このようにして圏$C$の対象の性質を集合の言葉で理解することができる。
+
+逆に$C$の対象$x$が定める関手$h_x$の性質を$x$を調べることで理解することができる。
+例えば$F$が何らかの興味ある関すだとして、これが$x$により表現可能、つまり$F=h_x$であるとしよう。
+このとき、$F$の性質を$x$の性質を用いて調べることができる。
+このような例として次の節でドモルガンの定理の証明を紹介する。
+
+\newpage
+
+\section{応用}
+$h_{[1]}$は冪集合を取る関手$P$と同型であることはすでに見た。
+
+集合$X$に対して、その部分集合の補集合をとる操作は写像$c(X):P(X)\to P(X)$を定める。
+これは実は関手$P$から$P$への自然変換$c:P \to P$を与えることがわかる。
+つまり、$\Sets$の射$f:X \to Y$に対して以下の図式
+\begin{align*}
+\begin{CD}
+P(Y)@>c(Y)>>P(Y)\\
+@VP(f)VV@VP(f)VV\\
+P(X)@>c(X)>>P(X)
+\end{CD}
+\end{align*}
+が可換であることが以下のようにわかる。
+
+$A \in P(Y)$すなわち部分集合$A\subset Y$をとる。
+右上を通って$P(X)$にうつすと、まず$c(Y)(A)=Y \setminus A$であり、
+これに対して$P(f)(Y\setminus A)=\{x \in X \mid f(x) \in Y \setminus A\}$である。
+
+一方で左下を通って$P(X)$にうつすと、まず$P(f)(A)=\{x \in X \mid f(x) \in A\}$であり、
+$c(X)(P(f)(A))=X \setminus P(f)(A)=\{x \in X \mid x \notin P(f)(A)\}=\{x \in X \mid f(x) \notin A\} $である。
+このことから、二つの部分集合が一致し、図式が可換であることがわかる。
+
+\vspace{10pt}
+先に述べたように、$P$と$h_{[1]}$は同一視できる。
+この同一視により、補集合を取るという自然変換$c:P \to P$は自然変換$c:h_{[1]} \to h_{[1]}$と見ることができる。
+つまり$c\in\Hom_{\Sets^{\Sets^{\rm op}}}(h_{[1]},h_{[1]})$である。
+
+米田の補題から$\Hom_{\Sets^{\Sets^{\rm op}}}(h_{[1]},h_{[1]})=\Hom_{\Sets}([1],[1])$なので、$c$に対応する写像$[1]\to [1]$がある。
+これはどのような写像になるか考えよう。
+米田の補題の証明にある自然変換$\psi:G \to F$を計算する。
+いま、$C=\Sets, F=h_{[1]}$として、自然変換の$[1]$での写像$\psi([1]):G([1]) \to F([1])$を調べると、
+\begin{align*}
+\psi([1]):G([1])=\Hom_{\Sets^{\Sets^{\rm op}}}(h_{[1]},h_{[1]}) \to F([1])=\Hom_{\Sets}([1],[1])
+\end{align*}
+は(\ref{psi_def})により$f$を補集合をとる自然変換$c$として
+\begin{align*}
+\psi([1])(c)=c([1])(\id_{[1]})\in\Hom_{\Sets}([1],[1])
+\end{align*}
+である。
+
+図式
+\begin{align*}
+\begin{CD}
+h_{[1]}([1])@>\psi([1])>>P([1])\\
+@VcVV@VcVV\\
+h_{[1]}([1])@>\psi([1])>>P([1])
+\end{CD}
+\end{align*}
+を用いて$P([1])$で$c([1])(\id_{[1]})$に対応する集合を計算すると、
+$\id_{[1]}$に対応するのが$\id_{[1]}^{-1}(1)=\{1\}\in P([1])$であり、
+これの補集合だから$c([1])(\id_{[1]})$に対応する集合は$\{0\}$である。
+これをもう一度$h_{[1]}([1])$に戻すと、$\chi_{\{0\}}$すなわち$0\mapsto 1, 1\mapsto 0$で定まる写像である。
+
+つまり、$0$と$1$を入れ替える写像$c:[1] \to [1]$から定まる自然変換$h_c:h_{[1]} \to h_{[1]}$こそが、上の自然変換$c:h_{[1]} \to h_{[1]}$であることがわかる。
+
+\vspace{10pt}
+
+
+集合$[1]$の直積$[1]\times [1]$が定める関手$h_{[1]\times[1]}:X\mapsto\Hom(X,[1] \times [1])$は
+$X\mapsto P(X)\times P(X)=\{(A,B)\mid A\subset X, B\subset X\}$を与える、つまり$X$に対して$X$の部分集合の組全体のなす集合を対応させる関手と自然に同一視できることを見よう。
+
+写像$f:X \to [1] \times [1]$というのは$f(x)=(0,0), (0,1), (1,0), (1,1)$のいずれかであり、
+各成分ごとに見れば$X \to [1]$を二つ$f_1, f_2$と並べたものである。
+したがって$h_{[1]}$と$P$の同一視と同じようにそれぞれの写像に対して部分集合$f_1^{-1}(1)$と$f_2^{-1}(1)$をとってやることで$X$の部分集合の組が得られる。
+逆に、$X$の部分集合の組$(A, B)$があれば特性関数を並べて$(\chi_A, \chi_B):X \to [1] \times [1]$を定めることができる。
+これらによって互いに逆な自然変換が与えられることは、以前と同様に証明できるのでここでは省略する。
+\vspace{10pt}
+
+さて、共通部分$A\cap B$を取る操作は写像$P(X) \times P(X) \to P(X)$を定めるが、これは$P\times P$から$P$への自然変換$\cap$を定める。
+和集合$A\cup B$についても同様に自然変換$\cup:P \times P \to P$を定める。
+
+上で見たように、これらは自然変換$h_{[1]\times[1]} \to h_{[1]}$とみなすことができ、
+米田の補題の全射性から、何らかの写像$[1]\times [1] \to [1]$により与えられることがわかる。
+これは具体的にはどのような写像か、補集合の場合と同様に考えてよう。
+
+まずは$\cap$の場合を考える。
+これも上と同様に、図式
+\begin{align*}
+\begin{CD}
+h_{[1]}([1]\times[1])@>\psi([1]\times[1])>>P([1]\times[1])\times P([1]\times[1])\\
+@V\cap([1]\times[1])VV@VP(f)VV\\
+h_{[1]}([1]\times[1])@>\psi([1]\times[1])>>P([1]\times[1])
+\end{CD}
+\end{align*}
+を用いて$\cap:P\times P \to P$に対応する自然変換$\cap:h_{[1]\times[1]} \to h_{[1]}$の$x=[1]\times[1]$における写像\begin{align*}
+\cap([1]\times[1]):h_{[1]\times[1]}([1]\times[1]) \to h_{[1]}([1]\times[1])
+\end{align*}
+により、$\id_{[1]\times[1]}$がどううつるかをみる。
+
+これを$P$の方にうつして考えると、
+\begin{align*}
+\cap([1]\times[1]):P([1]\times[1])\times P([1]\times[1])\to P([1]\times[1])
+\end{align*}
+を考えることになる。
+ここで$\id_{[1]\times[1]}\in h_{[1]\times[1]}([1]\times[1])$に対応する$[1] \times [1]$の部分集合のは、
+\begin{align*}
+(\{(1,0),(1,1)\},\{(0,1),(1,1)\})\in P([1]\times[1])\times P([1]\times[1])
+\end{align*}
+である。
+これを$\cap([1]\times[1])$でうつすと$\{(1,0),(1,1)\} \cap \{(0,1),(1,1)\} = \{(1,1)\} \in P([1]\times[1])$になる。
+これが$\id_{[1]\times[1]}$の$h_{[1]}([1] \times [1])$へのうつり先を$P([1]\times[1])$で見たもので、
+$h_{[1]}([1]\times[1])$に戻って、対応する写像は$\chi_{\{(1,1)\}}$、つまり$(1,1)$を$1$にうつし$(1,0), (0,0), (0,1)$を$0$にうつす写像$[1]\times[1] \to [1]$である。
+
+つまりこの写像が定める自然変換$h_{[1]\times[1]} \to h_{[1]}$が$\cap$である。
+
+次に$\cup$の場合を考える。
+これも上と同様に、図式
+\begin{align*}
+\begin{CD}
+h_{[1]}([1]\times[1])@>\psi([1]\times[1])>>P([1]\times[1])\times P([1]\times[1])\\
+@V\cup([1]\times[1])VV@VP(f)VV\\
+h_{[1]}([1]\times[1])@>\psi([1]\times[1])>>P([1]\times[1])
+\end{CD}
+\end{align*}
+を用いて$\cup:P\times P \to P$に対応する自然変換$\cup:h_{[1]\times[1]} \to h_{[1]}$の$x=[1]\times[1]$における写像\begin{align*}
+\cup([1]\times[1]):h_{[1]\times[1]}([1]\times[1]) \to h_{[1]}([1]\times[1])
+\end{align*}
+により、$\id_{[1]\times[1]}$がどううつるかをみる。
+
+これを$P$の方にうつして考えると、
+\begin{align*}
+\cup([1]\times[1]):P([1]\times[1])\times P([1]\times[1])\to P([1]\times[1])
+\end{align*}
+を考えることになる。
+ここで$\id_{[1]\times[1]}\in h_{[1]\times[1]}([1]\times[1])$に対応する$[1] \times [1]$の部分集合のは、
+\begin{align*}
+(\{(1,0),(1,1)\},\{(0,1),(1,1)\})\in P([1]\times[1])\times P([1]\times[1])
+\end{align*}
+である。
+これを$\cup([1]\times[1])$でうつすと$\{(1,0),(1,1)\} \cup \{(0,1),(1,1)\} = \{(1,0), (1,1), (0,1)\} \in P([1]\times[1])$になる。
+これが$\id_{[1]\times[1]}$の$h_{[1]}([1] \times [1])$へのうつり先を$P([1]\times[1])$で見たもので、
+$h_{[1]}([1]\times[1])$に戻って、対応する写像は$\chi_{\{(1,0), (1,1), (0,1)\}}$、つまり$(1,0), (1,1), (0,1)$を$1$にうつし$(0,0)$を$0$にうつす写像$[1]\times[1] \to [1]$である。
+
+つまりこの写像が定める自然変換$h_{[1]\times[1]} \to h_{[1]}$が$\cup$である。
+
+\vspace{10pt}
+さて、ドモルガンの定理とは、次のようなものであった。
+\begin{thm}[ドモルガンの定理]
+集合$X$の部分集合$A, B$に対して以下が成り立つ。
+\begin{align*}
+\overline{A\cap B}=\overline{A}\cup\overline{B}\\
+\overline{A\cup B}=\overline{A}\cap\overline{B}
+\end{align*}
+\end{thm}
+これを上で定めた写像$c, \cap, \cup$を使って書くと、
+\begin{align*}
+(c\times c)(\cap(A,B))=\cup(c(A),c(B)\\
+(c\times c)(\cup(A,B))=\cap(c(A),c(B)
+\end{align*}
+であり、これは次のような図式の可換性を言っていると解釈できる。
+\begin{multicols}{2}
+\[
+\begin{tikzcd}
+P(X) \times P(X) \ar[r, "\cap"] \ar[d, "{(c, c)}"] & P(X) \ar[d, "c"]\\
+P(X) \times P(X) \ar[r, "\cup"] & P(X)
+\end{tikzcd}
+\]
+
+\[
+\begin{tikzcd}
+P(X) \times P(X) \ar[r, "\cup"] \ar[d, "{(c, c)}"] & P(X) \ar[d, "c"]\\
+P(X) \times P(X) \ar[r, "\cap"] & P(X)
+\end{tikzcd}
+\]
+\end{multicols}
+これらは、$[1], [1] \times [1]$により表現される関手の間の図式である。
+つまり、
+\begin{multicols}{2}
+\[
+\begin{tikzcd}
+h_{[1]\times[1]} \ar[r, "\cap"] \ar[d, "{(c, c)}"] & h_{[1]} \ar[d, "c"]\\
+h_{[1]\times[1]} \ar[r, "\cup"] & h_{[1]}
+\end{tikzcd}
+\]
+
+\[
+\begin{tikzcd}
+h_{[1]\times[1]} \ar[r, "\cup"] \ar[d, "{(c, c)}"] & h_{[1]} \ar[d, "c"]\\
+h_{[1]\times[1]} \ar[r, "\cap"] & h_{[1]}
+\end{tikzcd}
+\]
+\end{multicols}
+
+これらの射は上で見たように$[1] \times [1] \to [1]$から定まるものであり、
+これらが一致することを見れば、米田の補題の単射性から二つの自然変換が一致することがわかる。
+
+
+よって以下の図式
+\begin{multicols}{2}
+\[
+\begin{tikzcd}
+{[1] \times [1]} \ar[r, "\cap"] \ar[d, "{(c, c)}"] & {[1]} \ar[d, "c"]\\
+{[1] \times [1]} \ar[r, "\cup"] & {[1]}
+\end{tikzcd}
+\]
+
+\[
+\begin{tikzcd}
+{[1] \times [1]} \ar[r, "\cup"] \ar[d, "{(c, c)}"] & {[1]} \ar[d, "c"]\\
+{[1] \times [1]} \ar[r, "\cap"] & {[1]}
+\end{tikzcd}
+\]
+\end{multicols}
+が可換であればよいが、これは直接$(0,0), (1,0), (0,1), (1,1)$の行き先を計算してやれば良い。
+
+つまり、直接集合$A, B$を触ることなく、米田の補題と表現可能関手による解釈により、ドモルガンの定理を証明することができた。
+\end{document}
