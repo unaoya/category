@@ -83,9 +83,9 @@ F(y)@>\phi(y)>>G(y)
 このとき、集合$X, Y$と写像$f:X \to Y$に対して図式
 \[
 \begin{CD}
-P(Y)@>\phi(y)>>h_{[1]}(Y)\\
+P(Y)@>\phi(Y)>>h_{[1]}(Y)\\
 @VP(f)VV@Vh_{[1]}(f)VV\\
-P(X)@>\phi(x)>>h_{[1]}(X)
+P(X)@>\phi(X)>>h_{[1]}(X)
 \end{CD}
 \]
 が可換になることが以下のようにわかる。
@@ -295,9 +295,9 @@ $f \in F(I)$と$J\subset I$に対し、$f$を$J$に制限することで$f\vert_
 さらにこの全単射は制限$I'\subset I$について整合的である、つまり$J'\subset J$に対して図式
 \[
 \begin{CD}
-F(J)@>\phi(J)>>G(J)=\Hom_{\Sets^{C^{\rm op}}}(h_y,F)\\
+F(J)@>\phi(J)>>G(J)=\Hom_{\Sets^{C^{\rm op}}}(h_J,F)\\
 @VVV@VVV\\
-F(J')@>\phi(J')>>G(J)=\Hom_{\Sets^{C^{\rm op}}}(h_x,F)
+F(J')@>\phi(J')>>G(J')=\Hom_{\Sets^{C^{\rm op}}}(h_{J'},F)
 \end{CD}
 \]
 が可換である。
@@ -308,9 +308,9 @@ $I$が表現する関手$h_I$は$J \subset I$に対しては一点集合、$J \n
 このとき、自然変換$h_I \to F$とは、各開区間$J$に対して$J \subset I$について$h_I(J)=\{*\} \to F(J)$を与え、$J'\subset J$に対して次の図式が整合的になる。
 \[
 \begin{CD}
-h_I(J)@>\phi(y)>>F(J)\\
+h_I(J)@>\phi(J)>>F(J)\\
 @VVV@VVV\\
-h_I(J')@>\phi(x)>>F(J')
+h_I(J')@>\phi(J')>>F(J')
 \end{CD}
 \]
 写像$h_I(J) \to F(J)$を与えるのは$f_J\in F(J)$を一つ与えることと同じで、
